@@ -1,7 +1,8 @@
 """
 User Models
 """
-import pytz
+
+# import pytz
 from datetime import datetime
 from typing import Optional, List
 
@@ -11,21 +12,22 @@ from pydantic import BaseModel, EmailStr, ConfigDict
 from models.thing_model import MyThing
 
 
-
-central_europe = pytz.timezone('Europe/Paris')
+# central_europe = pytz.timezone('Europe/Paris')
 
 
 class ImageBase(BaseModel):
     public_id: str
     uri: str
 
+
 class UserBase(Document):
     """User database representation"""
-    model_config = ConfigDict(extra='allow') 
-    
+
+    model_config = ConfigDict(extra="allow")
+
     first_name: Optional[str] | None = None
     last_name: Optional[str] | None = None
-    created_at: Optional[datetime] = datetime.now(central_europe)
+    # created_at: Optional[datetime] = datetime.now(central_europe)
     disabled: bool = False
     email: Optional[EmailStr] | None = None
     username: Optional[str] | None = None
@@ -34,10 +36,8 @@ class UserBase(Document):
 
     class Settings:
         name = "Users"
-        
 
-    
-    
+
 class UserIn(BaseModel):
     email: EmailStr
     username: str
@@ -56,8 +56,9 @@ class UserOut(BaseModel):
 
 class UserUpdate(BaseModel):
     """User database representation"""
-    model_config = ConfigDict(extra='allow')
-    
+
+    model_config = ConfigDict(extra="allow")
+
     first_name: Optional[str] | None = None
     last_name: Optional[str] | None = None
     email: Optional[EmailStr] | None = None

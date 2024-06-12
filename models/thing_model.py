@@ -1,7 +1,8 @@
 """
 User Models
 """
-import pytz
+
+# import pytz
 from datetime import datetime
 from typing import Optional
 
@@ -9,7 +10,7 @@ from beanie import Document, Link
 from pydantic import BaseModel, EmailStr, ConfigDict
 
 
-central_europe = pytz.timezone("Europe/Paris")
+# central_europe = pytz.timezone("Europe/Paris")
 
 
 class Category(BaseModel):
@@ -35,7 +36,7 @@ class MyThing(Document):
 
     thing_name: str | None = None
     thing_description: Optional[str] | None = None
-    created_at: datetime = datetime.now(central_europe)
+    # created_at: datetime = datetime.now(central_europe)
     owner: str | None = None
     category: Category
 

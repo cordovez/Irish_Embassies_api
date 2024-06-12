@@ -1,10 +1,13 @@
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
+from fastapi.openapi.utils import get_openapi
 
 from mongodb.db import init_db
-from routes.user_routes import user_route
+
+# from routes.user_routes import user_route
 from routes.token_route import token_route
+from routes.embassy_routes import router
 from models.message_models import Message
 
 
@@ -27,20 +30,60 @@ app.add_middleware(
 @app.get("/", tags=["root"])
 def root() -> Message:
     """Route is point of entry and publicly accessible"""
-    welcome_message = Message(
-        message="""Welcome to my FastApi boilerplate api. To view and use the routes, 
-        add '/docs' to the path that brought you to this page."""
-    )
-    return welcome_message
+    return {"message": "Ireland's Diplomatic Missions Abroad"}
 
 
-app.include_router(user_route, prefix="/user", tags=["users"])
-app.include_router(token_route, tags=["token"])
+app.include_router(router, prefix="/embassy", tags=["Embassies"])
+# app.include_router(token_route, tags=["token"])
 
 
 @app.on_event("startup")
 async def connect():
     await init_db()
+
+
+# ------------------------------------------------------------------------------
+# OpenAPI Customization
+# ------------------------------------------------------------------------------
+
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+
+    description = """An API to explore the various Irish Diplomatic Missions abroad and bilateral relations in general
+    """
+
+    openapi_schema = get_openapi(
+        title="Irish Diplomatic Representation Abroad",
+        version="1.0.0",
+        description=description,
+        routes=app.routes,
+        tags=[
+            {
+                "name": "Countries",
+                "description": "The listing of all countries and their Irish diplomatic representative (if any)",
+            },
+            {
+                "name": "Embassies",
+                "description": "Ambassadorial missions abroad",
+            },
+            {
+                "name": "Representations",
+                "description": "Diplomatic missions abroad other than embassies",
+            },
+            {
+                "name": "Admin",
+                "description": "API data management",
+            },
+        ],
+    )
+
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+
+app.openapi = custom_openapi
 
 
 if __name__ == "__main__":
