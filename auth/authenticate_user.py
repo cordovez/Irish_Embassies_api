@@ -1,9 +1,9 @@
-from models.user_model import UserBase
+from mongodb.user import User
 from auth.verify_password import verify_password
 
 
 async def get_user_by_username(username):
-    user_data = await UserBase.find_one(UserBase.username == username)
+    user_data = await User.find_one(User.username == username)
     if not user_data:
         return False
     return user_data

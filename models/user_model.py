@@ -35,7 +35,7 @@ class UserBase(Document):
     things: Optional[List[Link[MyThing]]] | None = []
 
     class Settings:
-        name = "Users"
+        name = "users"
 
 
 class UserIn(BaseModel):
