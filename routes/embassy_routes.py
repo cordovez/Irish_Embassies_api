@@ -6,7 +6,6 @@ from fastapi import APIRouter, Depends
 from typing import Annotated
 from fastapi.security import OAuth2PasswordBearer
 from auth.current_user import get_current_user
-from controllers.embassies_controllers import create_embassy
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -14,9 +13,9 @@ router = APIRouter()
 
 
 # Create
-@router.post("/")
-async def add_embassy_to_db(embassy):
-    return await create_embassy(embassy)
+@router.get("/")
+async def embassies():
+    pass
 
 
 # @router.post("/add_thing")
