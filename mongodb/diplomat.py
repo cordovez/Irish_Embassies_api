@@ -7,9 +7,9 @@ import pymongo
 from typing import Optional
 
 
-class Diplomat(beanie.Document):
-    first_name: str
+class DiplomatDocument(beanie.Document):
     last_name: str
+    first_name: str
     title: Optional[str]
     mission: Optional[str]
 
@@ -18,5 +18,10 @@ class Diplomat(beanie.Document):
         indexes = [
             pymongo.IndexModel(
                 keys=[("last_name", pymongo.ASCENDING)], name="last_name_ascend"
+            ),
+            pymongo.IndexModel(
+                keys=[("mission", pymongo.ASCENDING)],
+                name="mission_ascend",
+                unique=True,
             ),
         ]

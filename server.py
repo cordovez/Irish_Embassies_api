@@ -7,7 +7,7 @@ from mongodb.db import init_db
 
 # from routes.user_routes import user_route
 from routes.token_route import token_route
-from routes.embassy_routes import router
+from routes import embassy_routes, admin_routes
 from models.message_models import Message
 
 
@@ -33,7 +33,8 @@ def root() -> Message:
     return {"message": "Ireland's Diplomatic Missions Abroad"}
 
 
-app.include_router(router, prefix="/embassy", tags=["Embassies"])
+app.include_router(embassy_routes.router, prefix="/embassy", tags=["Embassies"])
+app.include_router(admin_routes.router, prefix="/process", tags=["Admin"])
 # app.include_router(token_route, tags=["token"])
 
 
