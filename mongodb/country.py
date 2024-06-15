@@ -7,7 +7,7 @@ import pymongo
 from typing import Optional
 
 
-class Country(beanie.Document):
+class CountryDocument(beanie.Document):
     type_of: EntityType = EntityType.CONSULATE.value
     name: str
     is_represented: bool
@@ -17,6 +17,7 @@ class Country(beanie.Document):
         name = "countries"
         indexes = [
             pymongo.IndexModel(
-                keys=[("name", pymongo.ASCENDING)], name="country_ascend"
+                keys=[("name", pymongo.ASCENDING)],
+                name="country_ascend",
             ),
         ]

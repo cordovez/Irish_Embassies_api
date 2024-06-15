@@ -3,7 +3,7 @@ from mongodb.mission import Mission
 from mongodb.entity_type import EntityType
 
 
-class Representation(Mission):
+class RepresentationDocument(Mission):
     type_of: EntityType = EntityType.REPRESENTATION.value
 
     class Settings:

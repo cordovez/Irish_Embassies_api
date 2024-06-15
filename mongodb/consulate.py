@@ -3,7 +3,7 @@ from mongodb.mission import Mission
 from mongodb.entity_type import EntityType
 
 
-class Consulate(Mission):
+class ConsulateDocument(Mission):
     type_of: EntityType = EntityType.CONSULATE.value
 
     class Settings:

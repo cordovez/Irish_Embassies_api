@@ -12,6 +12,7 @@ class DiplomatDocument(beanie.Document):
     first_name: str
     title: Optional[str]
     mission: Optional[str]
+    location: Optional[str]
 
     class Settings:
         name = "diplomats"
@@ -20,8 +21,7 @@ class DiplomatDocument(beanie.Document):
                 keys=[("last_name", pymongo.ASCENDING)], name="last_name_ascend"
             ),
             pymongo.IndexModel(
-                keys=[("mission", pymongo.ASCENDING)],
-                name="mission_ascend",
-                unique=True,
+                keys=[("location", pymongo.ASCENDING)],
+                name="diplomat_location_ascend",
             ),
         ]

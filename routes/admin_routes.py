@@ -9,8 +9,13 @@ from auth.current_user import get_current_user
 from models.source import Source
 from models.user_model import UserBase
 from mongodb.diplomat import DiplomatDocument
-from helpers.process_data_file import extract_diplomats
+from helpers.process_data_file import (
+    extract_diplomats,
+    extract_embassies,
+    extract_representations,
+)
 from services.add_documents import add_documents_to_mongo
+from custom_errors.source_file_err import SourceFileError
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -24,9 +29,55 @@ router = APIRouter()
     summary="names, titles, and missions",
 )
 async def diplomats(source_file: Source):
-    items = extract_diplomats(source_file)
-    document_list = [DiplomatDocument(**item.dict()) for item in items]
-    return await add_documents_to_mongo(DiplomatDocument, document_list)
+
+    if source_file.value not in ["embassies", "others"]:
+        raise SourceFileError(
+            source_file.value,
+            f'"{source_file.value}" is the wrong file. Please choose "embassies" or "others"',
+        )
+    diplomats = extract_diplomats(source_file)
+
+    diplomats_doc_list = [
+        DiplomatDocument(**diplomat.model_dump()) for diplomat in diplomats
+    ]
+
+    # await DiplomatDocument.find().delete()
+    response = await DiplomatDocument.insert_many(diplomats_doc_list)
+    # document_list = [DiplomatDocument(**item.dict()) for item in items]
+    # return await add_documents_to_mongo(DiplomatDocument, document_list)
+
+    return {"status": "success", "count": len(response.inserted_ids)}
+
+
+@router.post(
+    "/missions",
+    description="extracts mission from selected file and saves to mongodb",
+    summary="missions",
+)
+async def embassies(source_file: Source):
+    if source_file.value != "embassies":
+        raise SourceFileError(
+            source_file.value,
+            f'"{source_file.value}" is the wrong file. Please choose "embassies"',
+        )
+    items = extract_embassies(source_file)
+    return items
+    # return await add_documents_to_mongo(DiplomatDocument, document_list)
+
+
+@router.post(
+    "/representations",
+    description="extracts representations from selected file and saves to mongodb",
+    summary="missions",
+)
+async def representations(source_file: Source):
+    if source_file.value != "others":
+        raise SourceFileError(
+            source_file.value,
+            f'"{source_file.value}" is the wrong file. Please choose "others"',
+        )
+    return extract_representations(source_file)
+    # return await add_documents_to_mongo(DiplomatDocument, document_list)
 
 
 # @router.post("/add_thing")
