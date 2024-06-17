@@ -5,9 +5,7 @@ User registration router
 from fastapi import APIRouter, Depends
 from typing import Annotated
 from fastapi.security import OAuth2PasswordBearer
-from auth.current_user import get_current_user
 from models.source import Source
-from models.user_model import UserBase
 from mongodb.diplomat import DiplomatDocument
 from helpers.process_data_file import (
     extract_diplomats,

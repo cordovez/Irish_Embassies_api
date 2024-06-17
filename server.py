@@ -6,8 +6,13 @@ from fastapi.openapi.utils import get_openapi
 from mongodb.db import init_db
 
 # from routes.user_routes import user_route
-from routes.token_route import token_route
-from routes import embassy_routes, admin_routes, diplomat_routes
+from routes import (
+    token_route,
+    embassy_routes,
+    admin_routes,
+    diplomat_routes,
+    user_routes,
+)
 from models.message_models import Message
 
 
@@ -36,6 +41,8 @@ def root() -> Message:
 app.include_router(embassy_routes.router, prefix="/embassy", tags=["Embassies"])
 app.include_router(admin_routes.router, prefix="/process", tags=["Admin"])
 app.include_router(diplomat_routes.router, prefix="/diplomats", tags=["Diplomats"])
+app.include_router(token_route.router, tags=["Admin"])
+app.include_router(user_routes.router, tags=["User"])
 # app.include_router(token_route, tags=["token"])
 
 

@@ -1,12 +1,13 @@
 """
 Current user dependency
 """
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 
 from models.token_models import TokenData
-from models.user_model import UserBase
+from mongodb.user import UserBase
 
 from auth.authenticate_user import get_user_by_username
 

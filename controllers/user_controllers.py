@@ -2,7 +2,8 @@ from fastapi import HTTPException, status
 
 from beanie import UpdateResponse
 
-from models.user_model import UserIn, UserBase
+from models.user_model import UserIn
+from mongodb.user import UserBase
 from models.thing_model import MyThing
 from models.message_models import Message
 from auth.password_hasher import get_password_hash
@@ -31,8 +32,7 @@ async def create_user(user: UserIn):
 
     with_added_information = add_params(user)
 
-    saved_user = await UserBase.create(with_added_information)
-    return saved_user
+    return await UserBase.create(with_added_information)
 
 
 def add_params(user_in: UserIn):
@@ -51,13 +51,12 @@ def add_params(user_in: UserIn):
     user_name = user_dict["username"]
     uri = f"https://api.multiavatar.com/{user_name}.png"
     avatar_dict = {"public_id": None, "uri": uri}
-    user = UserBase(
+    return UserBase(
         email=user_dict["email"],
         username=user_dict["username"],
         password_hash=hashed_password,
         avatar=avatar_dict,
     )
-    return user
 
 
 async def add_something_to_user(thing, user):

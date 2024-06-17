@@ -20,24 +20,6 @@ class ImageBase(BaseModel):
     uri: str
 
 
-class UserBase(Document):
-    """User database representation"""
-
-    model_config = ConfigDict(extra="allow")
-
-    first_name: Optional[str] | None = None
-    last_name: Optional[str] | None = None
-    # created_at: Optional[datetime] = datetime.now(central_europe)
-    disabled: bool = False
-    email: Optional[EmailStr] | None = None
-    username: Optional[str] | None = None
-    password_hash: Optional[str] | None = None
-    things: Optional[List[Link[MyThing]]] | None = []
-
-    class Settings:
-        name = "users"
-
-
 class UserIn(BaseModel):
     email: EmailStr
     username: str
@@ -51,7 +33,6 @@ class UserOut(BaseModel):
     email: EmailStr
     username: str
     created_at: datetime
-    things: List[Link[MyThing]]
 
 
 class UserUpdate(BaseModel):
