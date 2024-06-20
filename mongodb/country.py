@@ -8,7 +8,7 @@ from typing import Optional
 
 
 class CountryDocument(beanie.Document):
-    type_of: EntityType = EntityType.CONSULATE.value
+    type_of: EntityType = EntityType.COUNTRY.value
     name: str
     is_represented: bool
     covered_by: Optional[str]
