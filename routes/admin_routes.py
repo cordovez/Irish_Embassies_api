@@ -2,18 +2,15 @@
 User registration router
 """
 
-from fastapi import APIRouter, Depends
-from typing import Annotated
+from fastapi import APIRouter
 from fastapi.security import OAuth2PasswordBearer
-from models.source import Source
-from mongodb.diplomat import DiplomatDocument
-from helpers.process_data_file import (
-    extract_diplomats,
-    extract_embassies,
-    extract_representations,
-)
-from services.add_documents import add_documents_to_mongo
-from custom_errors.source_file_err import SourceFileError
+
+# from helpers.process_data_file import (
+#     extract_diplomats,
+#     extract_embassies,
+#     extract_representations,
+# )
+from helpers import extract
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -23,43 +20,20 @@ router = APIRouter()
 # Create
 @router.post(
     "/diplomats",
-    description="extracts diplomats from selected file",
-    summary="names, titles, and missions",
+    description="extracts diplomats from spider scraper json file in '/data/'",
+    summary="saves diplomats to db",
 )
-async def diplomats(source_file: Source):
-
-    if source_file.value not in ["embassies", "others"]:
-        raise SourceFileError(
-            source_file.value,
-            f'"{source_file.value}" is the wrong file. Please choose "embassies" or "others"',
-        )
-    diplomats = extract_diplomats(source_file)
-
-    diplomats_doc_list = [
-        DiplomatDocument(**diplomat.model_dump()) for diplomat in diplomats
-    ]
-
-    # await DiplomatDocument.find().delete()
-    response = await DiplomatDocument.insert_many(diplomats_doc_list)
-    # document_list = [DiplomatDocument(**item.dict()) for item in items]
-    # return await add_documents_to_mongo(DiplomatDocument, document_list)
-
-    return {"status": "success", "count": len(response.inserted_ids)}
+async def save_diplomats_to_db():
+    return extract.diplomats()
 
 
 @router.post(
-    "/missions",
-    description="extracts mission from selected file and saves to mongodb",
-    summary="missions",
+    "/embassies",
+    description="extracts embassy missions from spider scraper json file in '/data/'",
+    summary="saves embassies to db",
 )
-async def embassies(source_file: Source):
-    if source_file.value != "embassies":
-        raise SourceFileError(
-            source_file.value,
-            f'"{source_file.value}" is the wrong file. Please choose "embassies"',
-        )
-    items = extract_embassies(source_file)
-    return items
+async def save_embassies_to_db():
+    return extract.embassies()
     # return await add_documents_to_mongo(DiplomatDocument, document_list)
 
 
@@ -69,9 +43,14 @@ async def embassies(source_file: Source):
     summary="missions",
 )
 async def representations():
-
-    return extract_representations("others")
+    pass
+    # return extract_representations("others")
     # return await add_documents_to_mongo(DiplomatDocument, document_list)
+
+
+# @router.get("/diplomats")
+# async def get_diplomats():
+#     return extract_diplomats()
 
 
 # @router.post("/add_thing")

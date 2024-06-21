@@ -1,6 +1,7 @@
 from enum import StrEnum, auto, IntEnum
 from typing import Optional
 import pydantic
+import beanie
 
 
 class Level(IntEnum):
@@ -16,11 +17,19 @@ class Gender(StrEnum):
     NOT_GIVEN = auto()
 
 
+class MissionType(StrEnum):
+    EMBASSY = auto()
+    CONSULATE = auto()
+    REPRESENTATION = auto()
+
+
 class Grade(StrEnum):
     THIRD = "third secretary"
     FIRST = "first secretary"
     COUNSELLOR = "counsellor"
     ASSIST_SEC = "assistant secretary"
+    DEP_SEC_GEN = "deputy secretary general"
+    SEC_GEN = "secretary general"
 
 
 class Person(pydantic.BaseModel):
@@ -32,6 +41,18 @@ class Person(pydantic.BaseModel):
     gender: Optional[Gender] | None = None
     mission: Optional[str] | None = None
     hom: bool
+
+
+class Diplomat(pydantic.BaseModel):
+    first_name: str
+    last_name: str
+    dob: Optional[str] | None = None
+    age: Optional[int] | None = None
+    grade: Grade | None = None
+    gender: Optional[Gender] | None = None
+    mission: Optional[str] | None = None
+    mission_type: Optional[MissionType] | None = None
+    hom: bool = True
 
 
 class ContactDetails(pydantic.BaseModel):
@@ -47,7 +68,7 @@ class ContactDetails(pydantic.BaseModel):
 
 
 class Mission(pydantic.BaseModel):
-    head_of_mission: Person
+    head_of_mission: Optional[Person] | None = None
     contact: Optional[ContactDetails] | None = None
     website: Optional[str] | None = None
 
@@ -71,6 +92,6 @@ class Representation(pydantic.BaseModel):
 
 
 class Embassy(Mission):
-    host_country: Country
-    consulates: list[Consulate] = []
-    level: Level = Level.THREE.value
+    host_country: str
+    consulates: Optional[list[Consulate]] = []
+    level: Level = Level.THREE
