@@ -6,11 +6,28 @@ from models.source import Source
 from models.diplomat import DiplomatModel
 
 # from models.embassy import EmbassyModel
-from models.contact import ContactDetails
+# from models.contact import ContactDetails
 from models.mission import MissionModel
 from custom_errors.source_file_err import SourceFileError
+from models.test_models import Representation, ContactDetails, Person
 
 DiplomatName = namedtuple("Name", "first last")
+MissionLocation = namedtuple("MissionLocation", "city country")
+
+
+def _process_location(address_str: str):
+    if not address_str:
+        return MissionLocation("", "")
+
+    pattern = r",\s*([\w\s\-]+)\s*,\s*([\w\s]+)$"
+
+    if match := re.search(pattern, address_str):
+        city_raw, country = match.groups()
+        city = re.search(r"[^\d]+", city_raw).group().strip()
+    else:
+        city, country = "", ""
+
+    return MissionLocation(city, country.strip())
 
 
 def extract_diplomats(data_source: Source) -> list[DiplomatModel]:
@@ -72,27 +89,49 @@ def extract_embassies(data_source: str) -> list[MissionModel]:
     return embassies
 
 
-def extract_representations(data_source: str) -> list[MissionModel]:
+def extract_representations(data_source: str) -> list[Representation]:
     items = _process_json_file(data_source)
     representations = []
     for item in items:
         if item["head_of_mission"]:
-            person = _process_head_of_mission(item)
-            contact = ContactDetails(
-                address=item["address"], tel=item["tel"], website=item["website"]
-            )
-            representation = MissionModel(
-                mission={
-                    "type_of": "representation",
-                    "representation": item["name"],
-                    "head_of_mission": person,
-                    "contact": contact,
-                }
+            # person = _process_head_of_mission(item)
+            contact = ContactDetails(address1=item["address"], tel=item["tel"])
+            representation = Representation(
+                # head_of_mission=person,
+                contact=contact,
+                website=item["website"],
+                representation_name=item["name"],
+                host_city=_process_location(item["address"]).city,
+                host_country=_process_location(item["address"]).country,
             )
 
             representations.append(representation)
 
     return representations
+
+
+# def extract_representations(data_source: str) -> list[MissionModel]:
+#     items = _process_json_file(data_source)
+#     representations = []
+#     for item in items:
+#         if item["head_of_mission"]:
+#             person = _process_head_of_mission(item)
+#             contact = ContactDetails(
+#                 address=item["address"], tel=item["tel"], website=item["website"]
+#             )
+#             representation = MissionModel(
+#                 mission={
+#                     "type_of": "representation",
+#                     "representation": item["name"],
+#                     "head_of_mission": person,
+#                     "contact": contact,
+
+#                 }
+#             )
+
+#             representations.append(representation)
+
+#     return representations
 
 
 # ------------------------------------------------------------------------------
@@ -121,15 +160,22 @@ def _process_head_of_mission(item) -> DiplomatModel:
 
 
 def _process_json_file(data_source: str) -> list:
-    file_name = data_source.value
-    if file_name == "countries":
-        raise SourceFileError(
-            file_name,
-            "The selection 'countries' does not contain data that can populate this model",
-        )
-    with open(f"data/{file_name}.json", "r") as file:
+
+    with open(f"data/{data_source}.json", "r") as file:
         json_raw = file.read()
     return json.loads(json_raw)
+
+
+# def _process_json_file(data_source: str) -> list:
+#     file_name = data_source.value
+#     if file_name == "countries":
+#         raise SourceFileError(
+#             file_name,
+#             "The selection 'countries' does not contain data that can populate this model",
+#         )
+#     with open(f"data/{file_name}.json", "r") as file:
+#         json_raw = file.read()
+#     return json.loads(json_raw)
 
 
 def _extract_consulates(embassy) -> list[MissionModel]:

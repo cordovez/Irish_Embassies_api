@@ -68,13 +68,9 @@ async def embassies(source_file: Source):
     description="extracts representations from selected file and saves to mongodb",
     summary="missions",
 )
-async def representations(source_file: Source):
-    if source_file.value != "others":
-        raise SourceFileError(
-            source_file.value,
-            f'"{source_file.value}" is the wrong file. Please choose "others"',
-        )
-    return extract_representations(source_file)
+async def representations():
+
+    return extract_representations("others")
     # return await add_documents_to_mongo(DiplomatDocument, document_list)
 
 
