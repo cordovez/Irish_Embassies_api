@@ -7,7 +7,7 @@ MissionLocation = namedtuple("MissionLocation", "city country")
 DiplomatName = namedtuple("Name", "first last")
 
 
-def location_from(address_str: str) -> tuple:
+def location_from_address(address_str: str) -> tuple:
     """
     Extrapolates city and country from an address string
     """
@@ -27,16 +27,34 @@ def location_from(address_str: str) -> tuple:
     return MissionLocation(city, country.strip())
 
 
-def city_from(address_str: str) -> str:
-    """
-    Extrapolates and returns the city (str) from an address string.
-    """
-    pattern = r"([\D\s]+)\d{5}$"
+# def city_from(address_str: str) -> str:
+#     """
+#     Extrapolates and returns the city (str) from an address string.
+#     """
+#     pattern = r".*,\s*([\D\s]+)$"
 
-    if match := re.search(pattern, address_str):
-        city_raw = match[1].strip()
-        return re.findall(r"[^\d]+", city_raw)[-1].strip()
-    return ""
+
+#     if match := re.search(pattern, address_str):
+#         city_raw = match[1].strip()
+#         return re.findall(r"[^\d]+", city_raw)[-1].strip()
+#     return ""
+def location_from_url(url: str) -> MissionLocation:
+    if not url.startswith("https://www.ireland.ie/en/"):
+        return MissionLocation("", "")
+
+    # Regex pattern to match the country and city from the URL
+    pattern = r"https://www\.ireland\.ie/en/([\w-]+)/([\w-]+)/"
+
+    if match := re.search(pattern, url):
+        country, city = match.groups()
+        if country == "usa":
+            country = "united states of america"
+        if country == "greatbritain":
+            country = "great britain"
+        city = compound_city_names(city)
+        return MissionLocation(city=city, country=country)
+
+    return MissionLocation("", "")
 
 
 def json_file_from(filename: str) -> list[dict]:
@@ -73,3 +91,18 @@ def names_from(name_str: str) -> DiplomatName:
     match = re.match(r"(\S+)\s+(.+)", name_str)
     first, last = match.groups() if match else (name_str, "")
     return DiplomatName(first, last)
+
+
+def compound_city_names(city: str) -> str:
+    """Cities with compound names have a space missing and are lower case"""
+    match city:
+        case "sanfrancisco":
+            return "san francisco"
+        case "newyork":
+            return "new york"
+        case "losangeles":
+            return "los angeles"
+        case "hongkong":
+            return "hong kong"
+        case _:
+            return city

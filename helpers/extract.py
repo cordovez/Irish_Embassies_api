@@ -1,4 +1,11 @@
-from mongodb.test_models import Diplomat, Embassy, ContactDetails
+from mongodb.test_models import (
+    Diplomat,
+    Embassy,
+    ContactDetails,
+    Consulate,
+    Country,
+    Representation,
+)
 from helpers import process
 
 
@@ -6,9 +13,14 @@ processed_json_data = process.json_file_from("all_categories")
 
 
 def diplomats():
+    """
+    Function parses JSON file to find diplomat (PersonDBDoc) data
+    """
     diplomats = []
     for item in processed_json_data:
-        if item["type_of"] != "country" and item["head_of_mission"]:
+        if (
+            item["type_of"] != "country" and item["head_of_mission"]
+        ):  # some items are duplicated in the json file, with empty 'head_of_mission'
             first = process.names_from(item["head_of_mission"]).first
             last = process.names_from(item["head_of_mission"]).last
             mission = item["name"]
@@ -18,7 +30,7 @@ def diplomats():
                 Diplomat(
                     first_name=first,
                     last_name=last,
-                    mission=mission,
+                    mission=process.compound_city_names(mission),
                     mission_type=mission_type,
                 )
             )
@@ -27,19 +39,14 @@ def diplomats():
 
 
 def embassies():
-    def _city_in_string(address: str, embassy_name: str) -> str:
-        """
-        Some embassy addresses contain the embassy_name name as the last word, others contain the city as the last word.
-
-        This function returns the city based on this distinction.
-        """
-        if process.location_from(address).country == embassy_name:
-            return process.location_from(address).city
-        return process.city_from(address)
-
+    """
+    Function parses JSON file to find embassy (EmbassyDBDoc) data
+    """
     embassies = []
     for item in processed_json_data:
-        if item["type_of"] == "embassy" and item["head_of_mission"]:
+        if (
+            item["type_of"] == "embassy" and item["head_of_mission"]
+        ):  # some items are duplicated in the json file, with empty 'head_of_mission'
             country = item["name"]
             address = item["address"]
             website = item["website"]
@@ -48,7 +55,7 @@ def embassies():
             contact = ContactDetails(
                 address1=address,
                 tel=tel,
-                city=_city_in_string(address, country),
+                city=process.location_from_url(website).city,
                 country=country,
             )
 
@@ -62,3 +69,84 @@ def embassies():
             )
 
     return embassies
+
+
+def consulates():
+    """
+    Function parses JSON file to find consulate (ConsulateDBDoc) data
+    """
+    consulates = []
+    for item in processed_json_data:
+        if (
+            item["type_of"] == "consulate" and item["head_of_mission"]
+        ):  # some items are duplicated in the json file, with empty 'head_of_mission'
+            country = process.location_from_url(item["website"]).country
+            address = item["address"]
+            website = item["website"]
+            tel = item["tel"]
+
+            contact = ContactDetails(
+                address1=address,
+                tel=tel,
+                city=process.location_from_url(website).city,
+                country=country,
+            )
+
+            # embassies.append(contact)
+            consulates.append(
+                Consulate(
+                    contact=contact,
+                    website=website,
+                    host_city=process.location_from_url(website).city,
+                )
+            )
+
+    return consulates
+
+
+def representations():
+    """
+    Function parses JSON file to find embassy (EmbassyDBDoc) data
+    """
+    representations = []
+    for item in processed_json_data:
+        if item["type_of"] == "other":
+            rep = item["name"]
+            website = item["website"]
+            address = item["address"]
+            tel = item["tel"]
+
+            contact = ContactDetails(
+                address1=address,
+                tel=tel,
+                city=process.location_from_address(item["address"]).city,
+                country=process.location_from_address(item["address"]).country,
+            )
+
+            # representations.append(contact)
+            representations.append(
+                Representation(
+                    contact=contact,
+                    website=website,
+                    representation_name=rep,
+                    host_city=process.location_from_address(item["address"]).city,
+                    host_country=process.location_from_address(item["address"]).country,
+                )
+            )
+
+    return representations
+
+
+def countries():
+    countries = []
+    for item in processed_json_data:
+        if item["type_of"] == "country":
+            countries.append(
+                Country(
+                    country_name=item["name"],
+                    # represented_in_dublin= ... ,
+                    hosts_irish_mission=item["is_represented"],
+                    # hosts_type_of_mission= ,
+                )
+            )
+    return countries

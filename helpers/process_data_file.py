@@ -200,21 +200,6 @@
 #     return DiplomatName(first, last)
 
 
-# def _process_compound_city_names(diplomats) -> list[DiplomatModel]:
-#     """Cities with compound names have a space missing and are lower case"""
-#     for diplomat in diplomats:
-#         match diplomat.mission:
-#             case "sanfrancisco":
-#                 diplomat.mission = "san francisco"
-#             case "newyork":
-#                 diplomat.mission = "new york"
-#             case "losangeles":
-#                 diplomat.mission = "los angeles"
-#             case "hongkong":
-#                 diplomat.mission = "hong kong"
-#     return diplomats
-
-
 # # for item in extract_embassies(Source.EMBASSIES):
 # #     pprint(item.model_dump_json(), indent=4)
 # # pprint(extract_embassies(Source.EMBASSIES), indent=4)

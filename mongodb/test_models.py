@@ -1,5 +1,5 @@
 from enum import StrEnum, auto, IntEnum
-from typing import Optional
+from typing import Optional, Literal
 import pydantic
 import beanie
 
@@ -75,16 +75,16 @@ class Mission(pydantic.BaseModel):
 
 class Country(pydantic.BaseModel):
     country_name: str
-    represented_in_dublin: bool = False
+    accredited_to_ireland: bool
+    with_mission_in: Literal["dublin", "london"] | None = None
     hosts_irish_mission: bool = False
-    hosts_type_of_mission: str | None = None
 
 
-class Consulate(pydantic.BaseModel):
+class Consulate(Mission):
     host_city: str
 
 
-class Representation(pydantic.BaseModel):
+class Representation(Mission):
     head_of_mission: Optional[Person] | None = None
     representation_name: str
     host_city: str
