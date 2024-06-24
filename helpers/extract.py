@@ -1,11 +1,10 @@
-from mongodb.test_models import (
-    Diplomat,
-    Embassy,
-    ContactDetails,
-    Consulate,
-    Country,
-    Representation,
-)
+from mongodb.consulate import ConsulateDocument
+from mongodb.contact import ContactDetails
+from mongodb.country import CountryDocument
+from mongodb.diplomat import DiplomatDocument
+from mongodb.embassy import EmbassyDocument
+from mongodb.representation import RepresentationDocument
+
 from helpers import process
 
 
@@ -27,7 +26,7 @@ def diplomats():
             mission_type = process.mission_type_from(item["type_of"])
 
             diplomats.append(
-                Diplomat(
+                DiplomatDocument(
                     first_name=first,
                     last_name=last,
                     mission=process.compound_city_names(mission),
@@ -61,7 +60,7 @@ def embassies():
 
             # embassies.append(contact)
             embassies.append(
-                Embassy(
+                EmbassyDocument(
                     contact=contact,
                     website=website,
                     host_country=country,
@@ -94,7 +93,7 @@ def consulates():
 
             # embassies.append(contact)
             consulates.append(
-                Consulate(
+                ConsulateDocument(
                     contact=contact,
                     website=website,
                     host_city=process.location_from_url(website).city,
@@ -125,7 +124,7 @@ def representations():
 
             # representations.append(contact)
             representations.append(
-                Representation(
+                RepresentationDocument(
                     contact=contact,
                     website=website,
                     representation_name=rep,
@@ -142,7 +141,7 @@ def countries():
     for item in processed_json_data:
         if item["type_of"] == "country":
             countries.append(
-                Country(
+                CountryDocument(
                     country_name=item["name"],
                     accredited_to_ireland=process.country_accredited_to_ie(
                         item["name"]

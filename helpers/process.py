@@ -3,7 +3,7 @@ import re
 import json
 import csv
 
-from mongodb.test_models import MissionType
+from schemas.enums import MissionType
 
 MissionLocation = namedtuple("MissionLocation", "city country")
 DiplomatName = namedtuple("Name", "first last")

@@ -4,6 +4,14 @@ User registration router
 
 from fastapi import APIRouter
 from fastapi.security import OAuth2PasswordBearer
+from controllers import in_db
+from mongodb.models import (
+    RepresentationDocument,
+    ConsulateDocument,
+    EmbassyDocument,
+    DiplomatDocument,
+    CountryDocument,
+)
 
 # from helpers.process_data_file import (
 #     extract_diplomats,
@@ -23,7 +31,8 @@ router = APIRouter()
     summary="saves diplomats to db",
 )
 async def save_diplomats_to_db():
-    return extract.diplomats()
+    save_diplomats = extract.diplomats()
+    return await in_db.batch_save_to_collection(DiplomatDocument, save_diplomats)
 
 
 @router.post(
@@ -32,7 +41,8 @@ async def save_diplomats_to_db():
     summary="saves embassies to db",
 )
 async def save_embassies_to_db():
-    return extract.embassies()
+    save_embassies = extract.embassies()
+    return await in_db.batch_save_to_collection(EmbassyDocument, save_embassies)
 
 
 @router.post(
@@ -41,7 +51,8 @@ async def save_embassies_to_db():
     summary="saves consulates to db",
 )
 async def save_consulates_to_db():
-    return extract.consulates()
+    save_consulates = extract.consulates()
+    return await in_db.batch_save_to_collection(ConsulateDocument, save_consulates)
 
 
 @router.post(
@@ -50,7 +61,10 @@ async def save_consulates_to_db():
     summary="saves representations to db",
 )
 async def representations():
-    return extract.representations()
+    save_representations = extract.representations()
+    return await in_db.batch_save_to_collection(
+        RepresentationDocument, save_representations
+    )
 
 
 @router.post(
@@ -58,5 +72,6 @@ async def representations():
     description="extracts countries from scraped data in json file file in '/data/all_categories.json'",
     summary="saves representations to db",
 )
-async def countries():
-    return extract.countries()
+async def save_countries_to_db():
+    save_countries = extract.countries()
+    return await in_db.batch_save_to_collection(CountryDocument, save_countries)

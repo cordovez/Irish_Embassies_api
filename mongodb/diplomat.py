@@ -1,18 +1,20 @@
 import pymongo
-from mongodb.entity_type import EntityType
 
 import beanie
-import pydantic
-import pymongo
 from typing import Optional
+from schemas.enums import Grade, Gender, MissionType
 
 
 class DiplomatDocument(beanie.Document):
-    last_name: str
     first_name: str
-    title: Optional[str]
-    mission: Optional[str]
-    location: Optional[str]
+    last_name: str
+    dob: Optional[str] | None = None
+    age: Optional[int] | None = None
+    grade: Grade | None = None
+    gender: Optional[Gender] | None = None
+    mission: Optional[str] | None = None
+    mission_type: Optional[MissionType] | None = None
+    hom: bool = True
 
     class Settings:
         name = "diplomats"
@@ -21,7 +23,7 @@ class DiplomatDocument(beanie.Document):
                 keys=[("last_name", pymongo.ASCENDING)], name="last_name_ascend"
             ),
             pymongo.IndexModel(
-                keys=[("location", pymongo.ASCENDING)],
-                name="diplomat_location_ascend",
+                keys=[("mission", pymongo.ASCENDING)],
+                name="diplomat_mission_ascend",
             ),
         ]

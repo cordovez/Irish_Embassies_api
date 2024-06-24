@@ -1,15 +1,20 @@
 import pymongo
 from mongodb.mission import Mission
-from mongodb.entity_type import EntityType
+from mongodb.diplomat import DiplomatDocument
+from typing import Optional
 
 
 class RepresentationDocument(Mission):
-    type_of: EntityType = EntityType.REPRESENTATION.value
+    head_of_mission: Optional[DiplomatDocument] | None = None
+    representation_name: str
+    host_city: str
+    host_country: str
 
     class Settings:
         name = "representations"
         indexes = [
             pymongo.IndexModel(
-                keys=[("name", pymongo.ASCENDING)], name="representation_ascend"
+                keys=[("representation_name", pymongo.ASCENDING)],
+                name="representation_ascend",
             ),
         ]

@@ -1,23 +1,19 @@
-import pymongo
-from mongodb.entity_type import EntityType
-
 import beanie
-import pydantic
 import pymongo
-from typing import Optional
+from typing import Literal
 
 
 class CountryDocument(beanie.Document):
-    type_of: EntityType = EntityType.COUNTRY.value
-    name: str
-    is_represented: bool
-    covered_by: Optional[str]
+    country_name: str
+    accredited_to_ireland: bool
+    with_mission_in: Literal["dublin", "london"] | None = None
+    hosts_irish_mission: bool = False
 
     class Settings:
         name = "countries"
         indexes = [
             pymongo.IndexModel(
-                keys=[("name", pymongo.ASCENDING)],
-                name="country_ascend",
+                keys=[("country_name", pymongo.ASCENDING)],
+                name="country_name_ascending",
             ),
         ]
