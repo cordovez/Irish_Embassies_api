@@ -1,7 +1,9 @@
 from collections import namedtuple
 import re
 import json
-from mongodb.test_models import MissionType
+import csv
+
+# from mongodb.test_models import MissionType
 
 MissionLocation = namedtuple("MissionLocation", "city country")
 DiplomatName = namedtuple("Name", "first last")
@@ -27,17 +29,6 @@ def location_from_address(address_str: str) -> tuple:
     return MissionLocation(city, country.strip())
 
 
-# def city_from(address_str: str) -> str:
-#     """
-#     Extrapolates and returns the city (str) from an address string.
-#     """
-#     pattern = r".*,\s*([\D\s]+)$"
-
-
-#     if match := re.search(pattern, address_str):
-#         city_raw = match[1].strip()
-#         return re.findall(r"[^\d]+", city_raw)[-1].strip()
-#     return ""
 def location_from_url(url: str) -> MissionLocation:
     if not url.startswith("https://www.ireland.ie/en/"):
         return MissionLocation("", "")
@@ -106,3 +97,23 @@ def compound_city_names(city: str) -> str:
             return "hong kong"
         case _:
             return city
+
+
+def country_accredited_to_ie(search_country: str) -> bool:
+    lower_case_country = search_country.lower()
+
+    with open("data/missions_accredited_to_ireland.csv", "r") as file:
+        return lower_case_country in [
+            country[0].lower() for country in csv.reader(file)
+        ]
+
+
+def location_of_foreign_mission_for(country: str) -> str:
+    if country_accredited_to_ie(country):
+
+        with open("data/foreign_missions_in_dublin.csv") as file:
+            lower_case_country = country.lower()
+            dublin_missions = [mission[0].lower() for mission in csv.reader(file)]
+            # for mission in csv.reader(file):
+            #     dublin_missions.append()
+            return "dublin" if lower_case_country in dublin_missions else "london"

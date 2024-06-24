@@ -144,7 +144,12 @@ def countries():
             countries.append(
                 Country(
                     country_name=item["name"],
-                    # represented_in_dublin= ... ,
+                    accredited_to_ireland=process.country_accredited_to_ie(
+                        item["name"]
+                    ),
+                    with_mission_in=process.location_of_foreign_mission_for(
+                        item["name"]
+                    ),
                     hosts_irish_mission=item["is_represented"],
                     # hosts_type_of_mission= ,
                 )
