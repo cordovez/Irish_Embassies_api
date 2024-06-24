@@ -12,6 +12,9 @@ from routes import (
     admin_routes,
     diplomat_routes,
     user_routes,
+    country_routes,
+    representation_routes,
+    consulate_routes,
 )
 from models.message_models import Message
 
@@ -38,10 +41,15 @@ def root() -> Message:
     return {"message": "Ireland's Diplomatic Missions Abroad"}
 
 
-app.include_router(embassy_routes.router, prefix="/embassy", tags=["Embassies"])
-app.include_router(admin_routes.router, prefix="/process", tags=["Admin"])
-app.include_router(diplomat_routes.router, prefix="/diplomats", tags=["Diplomats"])
 app.include_router(token_route.router, tags=["Admin"])
+app.include_router(country_routes.router, prefix="/countries", tags=["Countries"])
+app.include_router(embassy_routes.router, prefix="/embassies", tags=["Embassies"])
+app.include_router(consulate_routes.router, prefix="/consulates", tags=["Consulates"])
+app.include_router(
+    representation_routes.router, prefix="/representations", tags=["Representations"]
+)
+app.include_router(diplomat_routes.router, prefix="/diplomats", tags=["Diplomats"])
+app.include_router(admin_routes.router, prefix="/process", tags=["Admin"])
 app.include_router(user_routes.router, tags=["User"])
 # app.include_router(token_route, tags=["token"])
 
@@ -77,6 +85,7 @@ def custom_openapi():
                 "name": "Embassies",
                 "description": "Ambassadorial missions abroad",
             },
+            {"name": "Consulates", "description": "Irish Consulates abroad"},
             {
                 "name": "Representations",
                 "description": "Diplomatic missions abroad other than embassies",
