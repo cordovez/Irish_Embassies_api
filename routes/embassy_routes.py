@@ -17,7 +17,9 @@ router = APIRouter()
 # Create
 @router.get("/")
 async def all_embassies():
-    return await EmbassyDocument.all().to_list()
+    return await in_collection.embassies_return_all()
+
+    # return await EmbassyDocument.all().to_list()
 
 
 @router.get("/{id}")

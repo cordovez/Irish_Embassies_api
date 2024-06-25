@@ -2,15 +2,21 @@ from fastapi import HTTPException, status
 
 from beanie import UpdateResponse
 
-from auth.password_hasher import get_password_hash
 from mongodb.models import (
     EmbassyDocument,
     ConsulateDocument,
     DiplomatDocument,
     RepresentationDocument,
 )
-from schemas.enums import MissionType
-from controllers import in_db
+
+
+async def embassies_return_all():
+    embassies = []
+    for embassy in await EmbassyDocument.all().to_list():
+        embassy = await embassies_get_populated(embassy.id)
+        embassies.append(embassy)
+
+    return embassies
 
 
 async def embassies_get_populated(id: str) -> EmbassyDocument:
