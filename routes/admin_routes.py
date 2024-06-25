@@ -12,6 +12,7 @@ from mongodb.models import (
     DiplomatDocument,
     CountryDocument,
 )
+from schemas.enums import MissionType
 
 # from helpers.process_data_file import (
 #     extract_diplomats,
@@ -23,6 +24,10 @@ from helpers import extract
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 router = APIRouter()
+
+# ------------------------------------------------------------------------------
+# Diplomats
+# ------------------------------------------------------------------------------
 
 
 @router.post(
@@ -36,6 +41,20 @@ async def save_diplomats_to_db():
 
 
 @router.post(
+    "/diplomats/append-to-mission",
+    description="Finds mission of type consulate, embassy, or representation and appends its matching diplomat",
+    summary="appends diplomats to mission",
+)
+async def append_diplomats():
+    return await in_db.match_diplomat_to_mission()
+
+
+# ------------------------------------------------------------------------------
+# Embassies
+# ------------------------------------------------------------------------------
+
+
+@router.post(
     "/embassies",
     description="extracts embassy missions from scraped data in json file file in '/data/all_categories.json'",
     summary="saves embassies to db",
@@ -43,6 +62,15 @@ async def save_diplomats_to_db():
 async def save_embassies_to_db():
     save_embassies = extract.embassies()
     return await in_db.batch_save_to_collection(EmbassyDocument, save_embassies)
+
+
+@router.post(
+    "/embassies/add-consulates",
+    description="appends consulates to embassies",
+    summary="appends consulates",
+)
+async def append_consulates():
+    return await in_db.embassy_append_consulates()
 
 
 @router.post(
