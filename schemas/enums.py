@@ -27,3 +27,9 @@ class Grade(StrEnum):
     ASSIST_SEC = "assistant secretary"
     DEP_SEC_GEN = "deputy secretary general"
     SEC_GEN = "secretary general"
+
+
+class Source(StrEnum):
+    EMBASSIES = auto()
+    COUNTRIES = auto()
+    OTHERS = auto()

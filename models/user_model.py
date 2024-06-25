@@ -9,8 +9,6 @@ from typing import Optional, List
 from beanie import Document, Link
 from pydantic import BaseModel, EmailStr, ConfigDict
 
-from models.thing_model import MyThing
-
 
 # central_europe = pytz.timezone('Europe/Paris')
 

@@ -1,6 +1,8 @@
 import fastapi
 from fastapi import HTTPException, status
 from mongodb.consulate import ConsulateDocument
+from controllers import in_collection
+
 
 router = fastapi.APIRouter()
 
@@ -12,9 +14,4 @@ async def all_consulates():
 
 @router.get("/{id}")
 async def by_id(id: str):
-    try:
-        return await ConsulateDocument.get(id)
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Item not found"
-        ) from e
+    return await in_collection.consulates_add_head_of_mission(id)

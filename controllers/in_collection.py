@@ -7,12 +7,13 @@ from mongodb.models import (
     EmbassyDocument,
     ConsulateDocument,
     DiplomatDocument,
+    RepresentationDocument,
 )
 from schemas.enums import MissionType
 from controllers import in_db
 
 
-async def embassies_get_populated(id: str):
+async def embassies_get_populated(id: str) -> EmbassyDocument:
     embassy = await EmbassyDocument.get(id)
     country = embassy.host_country.lower()
 
@@ -31,6 +32,28 @@ async def embassies_get_populated(id: str):
             embassy.consulates = consulates
 
     return embassy
+
+
+async def consulates_add_head_of_mission(id: str) -> ConsulateDocument:
+    consulate = await ConsulateDocument.get(id)
+    if not consulate:
+        raise HTTPException(status_code=404, detail="Embassy not found")
+
+    city = consulate.host_city.lower()
+    consulate.head_of_mission = await _find_head_of_mission(city)
+
+    return consulate
+
+
+async def representations_add_head_of_mission(id: str) -> RepresentationDocument:
+    rep = await RepresentationDocument.get(id)
+    if not rep:
+        raise HTTPException(status_code=404, detail="Embassy not found")
+
+    name = rep.representation_name.lower()
+    rep.head_of_mission = await _find_head_of_mission(name)
+
+    return rep
 
 
 async def _find_head_of_mission(mission_name: str) -> DiplomatDocument:
