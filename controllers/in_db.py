@@ -13,7 +13,7 @@ async def batch_save_to_collection(
     doc: beanie.Document, documents: list[beanie.Document]
 ) -> dict:
     """
-    This Functions is intended to be used only to initialise the collection documents created from a json file.
+    This Function is intended to be used only to initialise the collection documents created from a json file.
     """
     try:
         if await doc.count() > 0:

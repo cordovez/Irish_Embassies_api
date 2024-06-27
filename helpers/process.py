@@ -63,12 +63,12 @@ def mission_type_from(mission: str) -> str:
     """
     match mission:
         case "embassy":
-            return MissionType.EMBASSY.value
+            return MissionType.EMBASSY
 
         case "consulate":
-            return MissionType.CONSULATE.value
+            return MissionType.CONSULATE
         case _:
-            return MissionType.REPRESENTATION.value
+            return MissionType.REPRESENTATION
 
 
 def names_from(name_str: str) -> DiplomatName:
@@ -117,3 +117,5 @@ def location_of_foreign_mission_for(country: str) -> str:
             # for mission in csv.reader(file):
             #     dublin_missions.append()
             return "dublin" if lower_case_country in dublin_missions else "london"
+
+
