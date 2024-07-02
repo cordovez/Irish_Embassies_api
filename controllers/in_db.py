@@ -13,7 +13,8 @@ async def batch_save_to_collection(
     doc: beanie.Document, documents: list[beanie.Document]
 ) -> dict:
     """
-    This Function is intended to be used only to initialise the collection documents created from a json file.
+    This Function is intended to be used only to initialise the collection documents
+    created from a json file.
     """
     try:
         if await doc.count() > 0:
@@ -67,7 +68,8 @@ async def embassy_append_consulates():
 #                 rep = RepresentationDocument.find_one(
 #                     RepresentationDocument.representation_name == diplomat.mission
 #                 )
-#                 return await rep.set({RepresentationDocument.head_of_mission: diplomat})
+#                 return await rep.set({RepresentationDocument.head_of_mission:
+#                 diplomat})
 async def match_diplomat_to_mission() -> list[dict]:
     """
     A one-time use function to add head of mission (Diplomat) to an Embassy

@@ -12,7 +12,6 @@ from mongodb.models import (
     DiplomatDocument,
     CountryDocument,
 )
-from schemas.enums import MissionType
 
 # from helpers.process_data_file import (
 #     extract_diplomats,

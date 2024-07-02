@@ -15,16 +15,16 @@ from routes import (
     country_routes,
     representation_routes,
     consulate_routes,
-)
+    mission_routes,
+    )
 from models.message_models import Message
-
 
 app = FastAPI()
 
 origins = [
     "http://localhost:3000",
     "http://localhost:8000",
-]
+    ]
 
 app.add_middleware(
     CORSMiddleware,
@@ -32,7 +32,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-)
+    )
 
 
 @app.get("/", tags=["root"])
@@ -43,14 +43,18 @@ def root() -> Message:
 
 app.include_router(token_route.router, tags=["Admin"])
 app.include_router(country_routes.router, prefix="/countries", tags=["Countries"])
+
+app.include_router(mission_routes.router, prefix="/missions", tags=["Missions"])
 app.include_router(embassy_routes.router, prefix="/embassies", tags=["Embassies"])
 app.include_router(consulate_routes.router, prefix="/consulates", tags=["Consulates"])
 app.include_router(
     representation_routes.router, prefix="/representations", tags=["Representations"]
-)
+    )
 app.include_router(diplomat_routes.router, prefix="/diplomats", tags=["Diplomats"])
 app.include_router(admin_routes.router, prefix="/process", tags=["Admin"])
 app.include_router(user_routes.router, tags=["User"])
+
+
 # app.include_router(token_route, tags=["token"])
 
 
@@ -79,34 +83,38 @@ def custom_openapi():
         tags=[
             {
                 "name": "Countries",
-                "description": "The listing of all countries and their Irish diplomatic representative (if any)",
-            },
+                "description": "The listing of all countries and their Irish "
+                               "diplomatic representative (if any)",
+                },
+            {
+                "name": "Missions",
+                "description": "Embassies, consulates, and representations"
+                },
             {
                 "name": "Embassies",
                 "description": "Ambassadorial missions abroad",
-            },
+                },
             {"name": "Consulates", "description": "Irish Consulates abroad"},
             {
                 "name": "Representations",
                 "description": "Diplomatic missions abroad other than embassies",
-            },
+                },
             {
                 "name": "Diplomats",
                 "description": "Diplomats posted abroad ",
-            },
+                },
             {
                 "name": "Admin",
                 "description": "API data management",
-            },
-        ],
-    )
+                },
+            ],
+        )
 
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 
 
 app.openapi = custom_openapi
-
 
 if __name__ == "__main__":
     uvicorn.run(reload=True, app="server:app")

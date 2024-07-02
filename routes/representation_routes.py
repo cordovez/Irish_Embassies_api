@@ -1,5 +1,4 @@
 import fastapi
-from fastapi import HTTPException, status
 from mongodb.representation import RepresentationDocument
 from controllers import in_collection
 

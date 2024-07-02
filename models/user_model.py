@@ -4,9 +4,8 @@ User Models
 
 # import pytz
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional
 
-from beanie import Document, Link
 from pydantic import BaseModel, EmailStr, ConfigDict
 
 
