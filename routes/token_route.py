@@ -4,7 +4,7 @@ from datetime import timedelta
 
 from auth.authenticate_user import authenticate_user
 from auth.create_access_token import create_access_token
-from models.token_models import Token
+from schemas.token_models import Token
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 1440
 

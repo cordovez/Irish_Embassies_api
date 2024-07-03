@@ -1,10 +1,8 @@
 from fastapi import HTTPException, status
 
-from beanie import UpdateResponse
 
-from models.user_model import UserIn
+from schemas.user_models import UserIn
 from mongodb.user import UserBase
-from models.message_models import Message
 from auth.password_hasher import get_password_hash
 
 
