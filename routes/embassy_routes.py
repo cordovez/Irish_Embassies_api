@@ -5,7 +5,6 @@ Embassy router
 from fastapi import APIRouter
 from fastapi.security import OAuth2PasswordBearer
 from controllers import from_missions
-from mongodb.mission import MissionUnion
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 

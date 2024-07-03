@@ -11,7 +11,7 @@ from mongodb.models import (
     EmbassyDocument,
     DiplomatDocument,
     CountryDocument,
-)
+    )
 
 # from helpers.process_data_file import (
 #     extract_diplomats,
@@ -24,81 +24,74 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 router = APIRouter()
 
+
 # ------------------------------------------------------------------------------
 # Diplomats
 # ------------------------------------------------------------------------------
-
-
 @router.post(
     "/diplomats",
-    description="extracts diplomats from scraped data in json file file in '/data/all_categories.json'",
+    description="extracts diplomats from scraped data in json file file in "
+                "'/data/all_categories.json'",
     summary="saves diplomats to db",
-)
+    )
 async def save_diplomats_to_db():
-    save_diplomats = extract.diplomats()
+    save_diplomats = extract.diplomats_from_json()
     return await in_db.batch_save_to_collection(DiplomatDocument, save_diplomats)
 
 
+# ------------------------------------------------------------------------------
+# Consulates
+# ------------------------------------------------------------------------------
 @router.post(
-    "/diplomats/append-to-mission",
-    description="Finds mission of type consulate, embassy, or representation and appends its matching diplomat",
-    summary="appends diplomats to mission",
-)
-async def append_diplomats():
-    return await in_db.match_diplomat_to_mission()
+    "/consulates",
+    description="extracts consulate missions from scraped data in json file file in "
+                "'/data/all_categories.json'",
+    summary="saves consulates to db",
+    )
+async def save_consulates_to_db():
+    consulates = extract.consulates_from_JSON()
+    return await in_db.batch_save_to_collection(ConsulateDocument, consulates)
 
 
 # ------------------------------------------------------------------------------
 # Embassies
 # ------------------------------------------------------------------------------
-
-
 @router.post(
     "/embassies",
-    description="extracts embassy missions from scraped data in json file file in '/data/all_categories.json'",
+    description="extracts embassy missions from scraped data in json file file in "
+                "'/data/all_categories.json'",
     summary="saves embassies to db",
-)
+    )
 async def save_embassies_to_db():
-    save_embassies = extract.embassies()
-    return await in_db.batch_save_to_collection(EmbassyDocument, save_embassies)
+    embassies = extract.embassies_from_json()
+    return await in_db.batch_save_to_collection(EmbassyDocument, embassies)
 
 
-@router.post(
-    "/embassies/add-consulates",
-    description="appends consulates to embassies",
-    summary="appends consulates",
-)
-async def append_consulates():
-    return await in_db.embassy_append_consulates()
-
-
-@router.post(
-    "/consulates",
-    description="extracts consulate missions from scraped data in json file file in '/data/all_categories.json'",
-    summary="saves consulates to db",
-)
-async def save_consulates_to_db():
-    save_consulates = extract.consulates()
-    return await in_db.batch_save_to_collection(ConsulateDocument, save_consulates)
-
-
+# ------------------------------------------------------------------------------
+# Representations
+# ------------------------------------------------------------------------------
 @router.post(
     "/representations",
-    description="extracts representation missions from scraped data in json file file in '/data/all_categories.json'",
+    description="extracts representation missions from scraped data in json file file "
+                "in '/data/all_categories.json'",
     summary="saves representations to db",
-)
-async def representations():
-    save_representations = extract.representations()
-    return await in_db.batch_save_to_collection(
-        RepresentationDocument, save_representations
     )
+async def asve_representations_to_db():
+    representations = extract.representations_from_json()
+    return await in_db.batch_save_to_collection(
+        RepresentationDocument, representations
+        )
 
 
+# ------------------------------------------------------------------------------
+# Countries
+# ------------------------------------------------------------------------------
 @router.post(
     "/countries",
-    description="extracts countries from scraped data in json file file in '/data/all_categories.json'",
-    summary="saves representations to db",
-)
+    description="extracts countries from scraped data in json file file in "
+                "'/data/all_categories.json'",
+    summary="saves countries to db",
+    )
 async def save_countries_to_db():
-    save_countries = extract.countries()
+    save_countries = extract.countries_from_JSON()
     return await in_db.batch_save_to_collection(CountryDocument, save_countries)

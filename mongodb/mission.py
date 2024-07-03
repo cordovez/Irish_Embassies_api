@@ -8,7 +8,7 @@ from mongodb.diplomat import DiplomatDocument
 
 class MissionUnion(UnionDoc):
     class Settings:
-        name = "mission_union"
+        name = "missions_union"
         class_id: "_class_id"
 
 

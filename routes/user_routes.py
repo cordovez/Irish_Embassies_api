@@ -102,7 +102,7 @@ async def update_user(
 @router.delete("/me/remove")
 async def delete_user(
     current_user: Annotated[UserBase, Depends(get_current_user)]
-) -> Message:
+):
     """
     Route deletes currently logged in user.
     """

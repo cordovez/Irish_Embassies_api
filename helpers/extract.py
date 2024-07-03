@@ -11,7 +11,7 @@ from helpers import process
 processed_json_data = process.json_file_from("all_categories")
 
 
-def diplomats():
+def diplomats_from_json():
     """
     Function parses JSON file to find diplomat (PersonDBDoc) data
     """
@@ -37,7 +37,7 @@ def diplomats():
     return diplomats
 
 
-def embassies():
+def embassies_from_json():
     """
     Function parses JSON file to find embassy (EmbassyDBDoc) data
     """
@@ -70,9 +70,10 @@ def embassies():
     return embassies
 
 
-def consulates():
+def consulates_from_json():
     """
-    Function parses JSON file to find consulate (ConsulateDBDoc) data
+    Function parses JSON file to find
+    consulate (ConsulateDBDoc) data
     """
     consulates = []
     for item in processed_json_data:
@@ -103,7 +104,7 @@ def consulates():
     return consulates
 
 
-def representations():
+def representations_from_json():
     """
     Function parses JSON file to find embassy (EmbassyDBDoc) data
     """
@@ -136,7 +137,7 @@ def representations():
     return representations
 
 
-def countries():
+def countries_from_JSON():
     countries = []
     for item in processed_json_data:
         if item["type_of"] == "country":

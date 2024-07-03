@@ -1,8 +1,8 @@
-from bson import ObjectId
 
 from mongodb.mission import MissionUnion
 from mongodb.diplomat import DiplomatDocument
 import beanie
+from mongodb.embassy import EmbassyDocument
 from fastapi import HTTPException
 
 
@@ -21,7 +21,8 @@ async def get_all_missions():
 
 async def get_embassies():
     missions = await get_all_missions()
-    embassies = [mission for mission in missions if mission.type_of == "embassy"]
+    embassies = [mission for mission in missions if mission.type_of ==
+                                                             "embassy"]
     consulates = [mission for mission in missions if mission.type_of == "consulate"]
 
     for embassy in embassies:

@@ -35,7 +35,7 @@ app.add_middleware(
 
 
 @app.get("/", tags=["root"])
-def root() -> Message:
+def root():
     """Route is point of entry and publicly accessible"""
     return {"message": "Ireland's Diplomatic Missions Abroad"}
 
