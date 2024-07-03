@@ -6,8 +6,7 @@ from fastapi import APIRouter, Depends
 from typing import Annotated
 from fastapi.security import OAuth2PasswordBearer
 from auth.current_user import get_current_user
-from models.user_model import UserIn, UserUpdate, UserOut
-from models.message_models import Message
+from schemas.user_models import UserIn, UserUpdate, UserOut
 from mongodb.user import UserBase
 from controllers.user_controllers import (
     create_user,

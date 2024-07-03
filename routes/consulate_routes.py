@@ -1,6 +1,5 @@
 import fastapi
-from mongodb.consulate import ConsulateDocument
-from controllers import in_collection, from_missions
+from controllers import from_missions
 
 
 

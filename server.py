@@ -17,7 +17,6 @@ from routes import (
     consulate_routes,
     mission_routes,
     )
-from models.message_models import Message
 
 app = FastAPI()
 

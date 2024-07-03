@@ -6,7 +6,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 
-from models.token_models import TokenData
+from schemas.token_models import TokenData
 from mongodb.user import UserBase
 
 from auth.authenticate_user import get_user_by_username

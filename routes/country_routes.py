@@ -1,6 +1,7 @@
-import fastapi
+
 from fastapi import HTTPException, status
 from mongodb.country import CountryDocument
+import fastapi
 
 router = fastapi.APIRouter()
 
@@ -10,11 +11,11 @@ async def all_countries():
     return await CountryDocument.find().to_list()
 
 
-@router.get("/{id}")
-async def by_id(id: str):
+@router.get("/{country_id}")
+async def by_id(country_id: str):
     try:
-        return await CountryDocument.get(id)
+        return await CountryDocument.get(country_id)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Item not found"
-        ) from e
+            ) from e

@@ -5,8 +5,6 @@ Mission router
 from fastapi import APIRouter
 from fastapi.security import OAuth2PasswordBearer
 from controllers import from_missions
-from controllers import in_collection
-from mongodb.mission import MissionUnion
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -24,7 +22,7 @@ async def all_missions():
     # return await MissionUnion.all().to_list()
 
 
-@router.get("/{id}")
+@router.get("/{mission_id}")
 async def by_id(mission_id: str):
-    pass
-    # return await in_collection...(mission_id)
+
+    return await from_missions.get_mission_by_id(mission_id)

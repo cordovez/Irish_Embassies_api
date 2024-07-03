@@ -1,6 +1,6 @@
 import fastapi
 from mongodb.representation import RepresentationDocument
-from controllers import in_collection
+from controllers import  from_missions
 
 
 router = fastapi.APIRouter()
@@ -8,9 +8,9 @@ router = fastapi.APIRouter()
 
 @router.get("/")
 async def all_representations():
-    return await RepresentationDocument.find().to_list()
+    return await from_missions.get_representations()
 
 
-@router.get("/{id}")
-async def by_id(id: str):
-    return await in_collection.representations_add_head_of_mission(id)
+@router.get("/{rep_id}")
+async def by_id(rep_id: str):
+    return await from_missions.get_mission_by_id(rep_id)
