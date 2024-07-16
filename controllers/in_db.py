@@ -1,12 +1,5 @@
 import beanie
 from fastapi import HTTPException
-from mongodb.models import (
-    ConsulateDocument,
-    EmbassyDocument,
-    DiplomatDocument,
-    RepresentationDocument,
-)
-from schemas.enums import MissionType
 
 
 async def batch_save_to_collection(

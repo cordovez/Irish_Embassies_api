@@ -13,6 +13,7 @@ router = APIRouter()
 
 @router.get("/")
 async def all_embassies():
+    # return await EmbassyDocument.all().to_list()
     return await from_missions.get_embassies()
 
 

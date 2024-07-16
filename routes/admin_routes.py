@@ -16,7 +16,7 @@ from mongodb.models import (
 # from helpers.process_data_file import (
 #     extract_diplomats,
 #     extract_embassies,
-#     extract_representations,
+#     extract_representations,e
 # )
 from helpers import extract
 
@@ -93,5 +93,5 @@ async def asve_representations_to_db():
     summary="saves countries to db",
     )
 async def save_countries_to_db():
-    save_countries = extract.countries_from_JSON()
-    return await in_db.batch_save_to_collection(CountryDocument, save_countries)
+    countries = extract.countries_with_embassies()
+    return await in_db.batch_save_to_collection(CountryDocument, countries)

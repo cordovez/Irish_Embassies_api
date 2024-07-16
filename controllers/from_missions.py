@@ -2,8 +2,6 @@
 from mongodb.mission import MissionUnion
 from mongodb.diplomat import DiplomatDocument
 import beanie
-from mongodb.embassy import EmbassyDocument
-from fastapi import HTTPException
 
 
 async def get_all_missions():

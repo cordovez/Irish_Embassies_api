@@ -11,7 +11,12 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 router = APIRouter()
 
 
-# Create
+# Todo: all missions are accessible by their Document Model. for example: EmbassyDoc(
+#  ).all().to_list() returns all embassies, but unpopulated. The function
+#  "from_missions.get_embassies()" will return it populated, but more slowly. Should
+#  there be a collection with fixed documents (that is, a collection where all
+#  embassies exist with consulates and hom already added?) or am I talking about caching?
+
 
 
 @router.get("/")

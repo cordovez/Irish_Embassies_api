@@ -2,6 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
+from contextlib import asynccontextmanager
 
 from mongodb.db import init_db
 
@@ -18,7 +19,13 @@ from routes import (
     mission_routes,
     )
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_db()
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 origins = [
     "http://localhost:3000",
@@ -57,9 +64,6 @@ app.include_router(user_routes.router, tags=["User"])
 # app.include_router(token_route, tags=["token"])
 
 
-@app.on_event("startup")
-async def connect():
-    await init_db()
 
 
 # ------------------------------------------------------------------------------
@@ -116,4 +120,4 @@ def custom_openapi():
 app.openapi = custom_openapi
 
 if __name__ == "__main__":
-    uvicorn.run(reload=True, app="server:app")
+    uvicorn.run(reload=True, app="server:app", port=8001)

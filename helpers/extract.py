@@ -1,3 +1,5 @@
+import json
+
 from mongodb.consulate import ConsulateDocument
 from mongodb.contact import ContactDetails
 from mongodb.country import CountryDocument
@@ -137,21 +139,88 @@ def representations_from_json():
     return representations
 
 
-def countries_from_JSON():
+def countries_from_json():
     countries = []
+    country_names = []
     for item in processed_json_data:
         if item["type_of"] == "country":
+            country_names.append(item["name"])
             countries.append(
                 CountryDocument(
                     country_name=item["name"],
                     accredited_to_ireland=process.country_accredited_to_ie(
                         item["name"]
-                    ),
+                        ),
                     with_mission_in=process.location_of_foreign_mission_for(
                         item["name"]
-                    ),
+                        ),
                     hosts_irish_mission=item["is_represented"],
-                    # hosts_type_of_mission= ,
+                    iso3_code=None,
+                    )
                 )
-            )
+
     return countries
+
+
+def countries_with_embassies() -> list[CountryDocument]:
+    """
+    Countries with embassies
+    """
+    embassies = _select_countries_with_embassies(processed_json_data)
+    countries=[]
+    for embassy in embassies:
+        embassy = CountryDocument(
+            country_name=embassy["name"],
+            accredited_to_ireland=process.country_accredited_to_ie(
+                        embassy["name"]
+                        ),
+            with_mission_in=process.location_of_foreign_mission_for(embassy["name"]),
+            hosts_irish_mission=embassy["is_represented"],
+            iso3_code=_assign_country_code_to_embassy(embassy),
+
+            )
+
+        countries.append(embassy)
+    return countries
+
+# ------------------------------------------------------------------------------
+# Helper Functions
+# ------------------------------------------------------------------------------
+
+
+def _assign_country_code_to_embassy(embassy: dict) -> str:
+    with open("./data/country_codes_iso.json", "r") as f:
+        countries = json.load(f)
+
+    for country in countries:
+        if country["name"] == "Slovakia":
+            country["name"] = "Slovak Republic"
+        if country["name"] == embassy["name"]:
+            return country["alpha-3"]
+
+
+def _select_countries_with_embassies(json_data):
+    embassies = []
+    for item in json_data:
+        item["name"] = _standardize_country_name(item["name"])
+        if item["type_of"] == "country" and item["name"] == item["covered_by"]:
+            embassies.append(item)
+    return embassies
+
+
+def _standardize_country_name(country_name):
+    match country_name:
+        case "Korea, Republic of (South Korea)":
+            return "Korea, Republic of"
+        case "Czech Republic":
+            return "Czechia"
+        case "Netherlands":
+            return "Netherlands, Kingdom of the"
+        case "Tanzania":
+            return "Tanzania, United Republic of"
+        case "Vietnam":
+            return "Viet Nam"
+        case "Great Britain":
+            return "United Kingdom of Great Britain and Northern Ireland"
+        case _:
+            return country_name

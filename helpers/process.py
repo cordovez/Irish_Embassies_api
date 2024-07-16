@@ -52,7 +52,7 @@ def json_file_from(filename: str) -> list[dict]:
     """
     reads content of json file with a context manager. Returns a list of dictionary items.
     """
-    with open(f"data/{filename}.json", "r") as file:
+    with open(f"./data/{filename}.json", "r") as file:
         json_raw = file.read()
     return json.loads(json_raw)
 
@@ -95,11 +95,14 @@ def compound_city_names(city: str) -> str:
             return "los angeles"
         case "hongkong":
             return "hong kong"
+        case "sãopaulo":
+            return "são paulo"
         case _:
             return city
 
 
 def country_accredited_to_ie(search_country: str) -> bool:
+
     lower_case_country = search_country.lower()
 
     with open("data/missions_accredited_to_ireland.csv", "r") as file:
@@ -108,14 +111,43 @@ def country_accredited_to_ie(search_country: str) -> bool:
         ]
 
 
-def location_of_foreign_mission_for(country: str) -> str:
-    if country_accredited_to_ie(country):
+def location_of_foreign_mission_for(country: str) -> str | None:
+    with open("data/foreign_missions_in_dublin.csv", "r") as file:
+        dublin_missions = [(mission[0], "dublin") for mission in csv.reader(file)]
 
-        with open("data/foreign_missions_in_dublin.csv") as file:
-            lower_case_country = country.lower()
-            dublin_missions = [mission[0].lower() for mission in csv.reader(file)]
-            # for mission in csv.reader(file):
-            #     dublin_missions.append()
-            return "dublin" if lower_case_country in dublin_missions else "london"
+    with open("data/foreign_missions_in_london.csv", "r") as file:
+        london_missions = [(mission[0], "london") for mission in csv.reader(file)]
+
+    foreign_missions = dublin_missions + london_missions
+    country = _get_proper_name(country)
+
+    if country is None:
+        return None
+
+    for mission in foreign_missions:
+        if country in mission[0]:
+            return mission[1]
 
 
+def _get_proper_name(country: str) -> str:
+    match country:
+        case "United Kingdom of Great Britain and Northern Ireland":
+            return "United Kingdom"
+        case "Korea, Republic of":
+            return "South Korea"
+        case "Netherlands, Kingdom of the":
+            return "Netherlands"
+        case "Russian Federation":
+            return "Russia"
+        case "Tanzania, United Republic of":
+            return "Tanzania"
+        case "Viet Nam":
+            return "Vietnam"
+        case "Slovak Republic":
+            return "Slovakia"
+        case "Türkiye":
+            return "Turkey"
+        case "United States of America":
+            return "United States"
+        case _:
+            return country
