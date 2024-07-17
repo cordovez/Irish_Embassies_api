@@ -9,7 +9,6 @@ from mongodb.representation import RepresentationDocument
 
 from helpers import process
 
-
 processed_json_data = process.json_file_from("all_categories")
 
 
@@ -20,21 +19,17 @@ def diplomats_from_json():
     diplomats = []
     for item in processed_json_data:
         if (
-            item["type_of"] != "country" and item["head_of_mission"]
+                item["type_of"] != "country" and item["head_of_mission"]
         ):  # some items are duplicated in the json file, with empty 'head_of_mission'
-            first = process.names_from(item["head_of_mission"]).first
-            last = process.names_from(item["head_of_mission"]).last
-            mission = item["name"]
-            mission_type = process.mission_type_from(item["type_of"])
 
             diplomats.append(
                 DiplomatDocument(
-                    first_name=first,
-                    last_name=last,
-                    mission=process.compound_city_names(mission),
-                    mission_type=mission_type,
-                )
-            )
+                    first_name=process.names_from(item["head_of_mission"]).first,
+                    last_name=process.names_from(item["head_of_mission"]).last,
+                    mission=process.compound_city_names(item["name"]),
+                    mission_type=process.mission_type_from(item["type_of"],
+                                                           )
+                    ))
 
     return diplomats
 
@@ -45,63 +40,45 @@ def embassies_from_json():
     """
     embassies = []
     for item in processed_json_data:
-        if (
-            item["type_of"] == "embassy" and item["head_of_mission"]
-        ):  # some items are duplicated in the json file, with empty 'head_of_mission'
-            country = item["name"]
-            address = item["address"]
-            website = item["website"]
-            tel = item["tel"]
-
+        if item["type_of"] == "embassy" and item["head_of_mission"]:
             contact = ContactDetails(
-                address1=address,
-                tel=tel,
-                city=process.location_from_url(website).city,
-                country=country,
-            )
-
-            # embassies.append(contact)
-            embassies.append(
-                EmbassyDocument(
-                    contact=contact,
-                    website=website,
-                    host_country=country,
+                address1=item["address"],
+                tel=item["tel"],
+                city=process.location_from_url(item["website"]).city,
+                country=item["name"],
                 )
-            )
+            embassy = EmbassyDocument(
+                contact=contact,
+                website=item["website"],
+                host_country=item["name"],
+                )
+            embassies.append(embassy)
 
     return embassies
 
 
 def consulates_from_json():
     """
-    Function parses JSON file to find
-    consulate (ConsulateDBDoc) data
+    Function parses JSON file to find consulate (ConsulateDBDoc) data
     """
     consulates = []
     for item in processed_json_data:
-        if (
-            item["type_of"] == "consulate" and item["head_of_mission"]
-        ):  # some items are duplicated in the json file, with empty 'head_of_mission'
-            country = process.location_from_url(item["website"]).country
-            address = item["address"]
-            website = item["website"]
-            tel = item["tel"]
-
+        if item["type_of"] == "consulate" and item["head_of_mission"]:
             contact = ContactDetails(
-                address1=address,
-                tel=tel,
-                city=process.location_from_url(website).city,
-                country=country,
-            )
+                address1=item["address"],
+                tel=item["tel"],
+                city=process.location_from_url(item["website"]).city,
+                country=process.location_from_url(item["website"]).country,
+                )
 
             # embassies.append(contact)
             consulates.append(
                 ConsulateDocument(
                     contact=contact,
-                    website=website,
-                    host_city=process.location_from_url(website).city,
+                    website=item["website"],
+                    host_city=process.location_from_url(item["website"]).city,
+                    )
                 )
-            )
 
     return consulates
 
@@ -113,38 +90,31 @@ def representations_from_json():
     representations = []
     for item in processed_json_data:
         if item["type_of"] == "other":
-            rep = item["name"]
-            website = item["website"]
-            address = item["address"]
-            tel = item["tel"]
-
             contact = ContactDetails(
-                address1=address,
-                tel=tel,
+                address1=item["address"],
+                tel=item["tel"],
                 city=process.location_from_address(item["address"]).city,
                 country=process.location_from_address(item["address"]).country,
-            )
+                )
 
             # representations.append(contact)
             representations.append(
                 RepresentationDocument(
                     contact=contact,
-                    website=website,
-                    representation_name=rep,
+                    website=item["website"],
+                    representation_name=item["name"],
                     host_city=process.location_from_address(item["address"]).city,
                     host_country=process.location_from_address(item["address"]).country,
+                    )
                 )
-            )
 
     return representations
 
 
 def countries_from_json():
     countries = []
-    country_names = []
     for item in processed_json_data:
         if item["type_of"] == "country":
-            country_names.append(item["name"])
             countries.append(
                 CountryDocument(
                     country_name=item["name"],
@@ -162,26 +132,27 @@ def countries_from_json():
     return countries
 
 
-def countries_with_embassies() -> list[CountryDocument]:
-    """
-    Countries with embassies
-    """
-    embassies = _select_countries_with_embassies(processed_json_data)
-    countries=[]
-    for embassy in embassies:
-        embassy = CountryDocument(
-            country_name=embassy["name"],
-            accredited_to_ireland=process.country_accredited_to_ie(
-                        embassy["name"]
-                        ),
-            with_mission_in=process.location_of_foreign_mission_for(embassy["name"]),
-            hosts_irish_mission=embassy["is_represented"],
-            iso3_code=_assign_country_code_to_embassy(embassy),
+# def countries_with_embassies() -> list[CountryDocument]:
+#     """
+#     Countries with embassies
+#     """
+#     embassies = _select_countries_with_embassies(processed_json_data)
+#     countries = []
+#     for embassy in embassies:
+#         embassy = CountryDocument(
+#             country_name=embassy["name"],
+#             accredited_to_ireland=process.country_accredited_to_ie(
+#                 embassy["name"]
+#                 ),
+#             with_mission_in=process.location_of_foreign_mission_for(embassy["name"]),
+#             hosts_irish_mission=embassy["is_represented"],
+#             iso3_code=_assign_country_code_to_embassy(embassy),
+#
+#             )
+#
+#         countries.append(embassy)
+#     return countries
 
-            )
-
-        countries.append(embassy)
-    return countries
 
 # ------------------------------------------------------------------------------
 # Helper Functions

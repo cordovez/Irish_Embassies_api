@@ -32,7 +32,7 @@ router = APIRouter()
     "/diplomats",
     description="extracts diplomats from scraped data in json file file in "
                 "'/data/all_categories.json'",
-    summary="saves diplomats to db",
+    summary="saves diplomats to 'diplomats' collection db",
     )
 async def save_diplomats_to_db():
     save_diplomats = extract.diplomats_from_json()
@@ -46,10 +46,10 @@ async def save_diplomats_to_db():
     "/consulates",
     description="extracts consulate missions from scraped data in json file file in "
                 "'/data/all_categories.json'",
-    summary="saves consulates to db",
+    summary="saves consulates to 'missions_union' collection db",
     )
 async def save_consulates_to_db():
-    consulates = extract.consulates_from_JSON()
+    consulates = extract.consulates_from_json()
     return await in_db.batch_save_to_collection(ConsulateDocument, consulates)
 
 
@@ -60,7 +60,7 @@ async def save_consulates_to_db():
     "/embassies",
     description="extracts embassy missions from scraped data in json file file in "
                 "'/data/all_categories.json'",
-    summary="saves embassies to db",
+    summary="saves embassies to 'missions_union' collection in db",
     )
 async def save_embassies_to_db():
     embassies = extract.embassies_from_json()
@@ -74,9 +74,9 @@ async def save_embassies_to_db():
     "/representations",
     description="extracts representation missions from scraped data in json file file "
                 "in '/data/all_categories.json'",
-    summary="saves representations to db",
+    summary="saves representations to 'missions_union' collection in db",
     )
-async def asve_representations_to_db():
+async def save_representations_to_db():
     representations = extract.representations_from_json()
     return await in_db.batch_save_to_collection(
         RepresentationDocument, representations
@@ -90,7 +90,7 @@ async def asve_representations_to_db():
     "/countries",
     description="extracts countries from scraped data in json file file in "
                 "'/data/all_categories.json'",
-    summary="saves countries to db",
+    summary="saves countries to 'countries' collection in db",
     )
 async def save_countries_to_db():
     countries = extract.countries_with_embassies()
