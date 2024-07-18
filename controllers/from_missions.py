@@ -1,6 +1,7 @@
 
 from mongodb.mission import MissionUnion
 from mongodb.diplomat import DiplomatDocument
+from helpers.process import compound_city_names
 import beanie
 
 
@@ -17,17 +18,18 @@ async def get_all_missions():
     return missions
 
 
-async def get_embassies():
-    missions = await get_all_missions()
-    embassies = [mission for mission in missions if mission.type_of ==
-                                                             "embassy"]
-    consulates = [mission for mission in missions if mission.type_of == "consulate"]
-
-    for embassy in embassies:
-        for consulate in consulates:
-            if consulate.contact.country == embassy.host_country.lower():
-                embassy.consulates.append(consulate)
-    return embassies
+# async def get_embassies():
+#     missions = await get_all_missions()
+#     embassies = [mission for mission in missions if mission.type_of ==
+#                                                              "embassy"]
+#     consulates = [mission for mission in missions if mission.type_of == "consulate"]
+#
+#     for embassy in embassies:
+#         embassy.contact.city = compound_city_names(embassy.contact.city)
+#         for consulate in consulates:
+#             if consulate.contact.country == embassy.host_country.lower():
+#                 embassy.consulates.append(consulate)
+#     return embassies
 
 
 async def get_consulates():

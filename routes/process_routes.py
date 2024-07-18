@@ -4,26 +4,24 @@ User registration router
 
 from fastapi import APIRouter
 from fastapi.security import OAuth2PasswordBearer
-from controllers import in_db
+from controllers import in_db, from_missions
 from mongodb.models import (
     RepresentationDocument,
     ConsulateDocument,
     EmbassyDocument,
     DiplomatDocument,
-    CountryDocument,
+    CountryDocument, PublicEmbassyDocument, MissionUnion, PublicRepresentationDocument
     )
 
-# from helpers.process_data_file import (
-#     extract_diplomats,
-#     extract_embassies,
-#     extract_representations,e
-# )
 from helpers import extract
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 router = APIRouter()
 
+@router.post("/missions")
+async def process_missions():
+    return await extract.save_missions_to_db()
 
 # ------------------------------------------------------------------------------
 # Diplomats
@@ -35,7 +33,7 @@ router = APIRouter()
     summary="saves diplomats to 'diplomats' collection db",
     )
 async def save_diplomats_to_db():
-    save_diplomats = extract.diplomats_from_json()
+    save_diplomats = extract._diplomats_from_json()
     return await in_db.batch_save_to_collection(DiplomatDocument, save_diplomats)
 
 
@@ -67,6 +65,12 @@ async def save_embassies_to_db():
     return await in_db.batch_save_to_collection(EmbassyDocument, embassies)
 
 
+@router.post("/public-embassies")
+async def save_populated_embassies_to_db():
+    embassies = await from_missions.get_embassies()
+    return await in_db.batch_save_to_collection(PublicEmbassyDocument, embassies)
+
+
 # ------------------------------------------------------------------------------
 # Representations
 # ------------------------------------------------------------------------------
@@ -81,6 +85,12 @@ async def save_representations_to_db():
     return await in_db.batch_save_to_collection(
         RepresentationDocument, representations
         )
+
+#TODO head of missions not being added to document
+@router.post("/public-representations")
+async def save_populated_representations_to_db():
+    representations = await from_missions.get_representations()
+    return await in_db.batch_save_to_collection(PublicRepresentationDocument, representations)
 
 
 # ------------------------------------------------------------------------------

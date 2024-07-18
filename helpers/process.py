@@ -97,6 +97,8 @@ def compound_city_names(city: str) -> str:
             return "hong kong"
         case "sãopaulo":
             return "são paulo"
+        case "buenosaires":
+            return "buenos aires"
         case _:
             return city
 

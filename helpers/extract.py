@@ -1,18 +1,112 @@
 import json
+import beanie
 
+from fastapi import HTTPException
 from mongodb.consulate import ConsulateDocument
 from mongodb.contact import ContactDetails
 from mongodb.country import CountryDocument
 from mongodb.diplomat import DiplomatDocument
 from mongodb.embassy import EmbassyDocument
 from mongodb.representation import RepresentationDocument
+from mongodb.mission import MissionUnion
+from mongodb.models import PublicEmbassyDocument, PublicRepresentationDocument
+from controllers import in_db
 
 from helpers import process
 
 processed_json_data = process.json_file_from("all_categories")
 
 
-def diplomats_from_json():
+# TODO use this function in a "one_route_to_rule_them_all"
+async def _save_all_diplomats_to_db():
+    diplomats = _diplomats_from_json()
+    return await _batch_save_to_collection(DiplomatDocument, diplomats)
+
+
+async def _collect_all_missions() -> list[beanie.Document]:
+    consulates = consulates_from_json()
+    embassies = embassies_from_json()
+    representations = representations_from_json()
+
+    await _batch_save_to_collection(EmbassyDocument, embassies)
+    await _batch_save_to_collection(ConsulateDocument, consulates)
+    await _batch_save_to_collection(RepresentationDocument, representations)
+
+    return await MissionUnion.all().to_list()
+
+
+
+async def _assign_diplomats(missions: list[beanie.Document]) -> list[beanie.Document]:
+    for mission in missions:
+        if mission.type_of == 'embassy':
+            mission.head_of_mission = await _get_hom(mission.host_country.lower())
+        elif mission.type_of == 'consulate':
+            mission.head_of_mission = await _get_hom(mission.host_city.lower())
+        elif mission.type_of == 'representation':
+            mission.head_of_mission = await _get_hom(mission.representation_name.lower())
+    return missions
+
+
+def _match_consulates_to_embassy(missions: list):
+    embassies = [mission for mission in missions if mission.type_of == "embassy"]
+    consulates = [mission for mission in missions if mission.type_of == "consulate"]
+    representations = [mission for mission in missions if mission.type_of ==
+                       "representation"]
+
+    for embassy in embassies:
+        embassy.contact.city = process.compound_city_names(embassy.contact.city)
+        for consulate in consulates:
+            if consulate.contact.country.lower() == embassy.host_country.lower():
+                embassy.consulates.append(consulate)
+
+    missions = list(embassies)
+    missions.extend(iter(representations))
+
+    return missions
+
+
+async def _get_hom(search_location: str) -> DiplomatDocument:
+    city = process.compound_city_names(search_location).lower()
+    diplomats = await DiplomatDocument.all().to_list()
+    for diplomat in diplomats:
+        assigned_mission = process.compound_city_names(diplomat.mission.lower())
+        if assigned_mission == city:
+            return diplomat
+
+
+async def _add_to_db(beanie_doc, mission):
+    try:
+        if await beanie_doc.count() > 0:
+            return {"message": "collection is not empty. Nothing was added"}
+
+        result = await beanie_doc(mission).save()
+        return {"message": f"{len(result.inserted_ids)} documents added "
+                           f"successfully to 'embassies' collection"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) from e
+
+
+async def _save_public_missions(missions: list[beanie.Document]):
+    embassies = [mission for mission in missions if mission.type_of == 'embassy']
+    representations = [mission for mission in missions if mission.type_of == 'representation']
+
+    embassy_message = await _batch_save_to_collection(PublicEmbassyDocument, embassies)
+    representation_message = await _batch_save_to_collection(PublicRepresentationDocument,
+                                                             representations)
+
+    return [embassy_message, representation_message]
+
+
+async def save_missions_to_db():
+    await _save_all_diplomats_to_db()
+    missions = await _collect_all_missions()
+    populated_missions = await _assign_diplomats(missions)
+    embassies_and_reps = _match_consulates_to_embassy(populated_missions)
+
+    return await _save_public_missions(embassies_and_reps)
+
+
+def _diplomats_from_json() -> list[DiplomatDocument]:
     """
     Function parses JSON file to find diplomat (PersonDBDoc) data
     """
@@ -157,6 +251,26 @@ def countries_from_json():
 # ------------------------------------------------------------------------------
 # Helper Functions
 # ------------------------------------------------------------------------------
+async def _batch_save_to_collection(
+    doc: beanie.Document, documents: list[beanie.Document]
+) -> dict:
+    """
+    This Function is intended to be used only to initialise the collection documents
+    created from a json file.
+    """
+    try:
+        if await doc.count() > 0:
+            return {"message": f"Collection '"
+                               f"{doc.__name__.replace('Document','')}s' is not empty, "
+                               f"no documents "
+                               f"were added"}
+
+        result = await doc.insert_many(documents)
+        return {"message": f"{len(result.inserted_ids)} documents added successfully "
+                           f"to {doc.__name__.replace('Document','')}s' collection"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 def _assign_country_code_to_embassy(embassy: dict) -> str:
