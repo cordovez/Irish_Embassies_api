@@ -5,7 +5,7 @@ User registration router
 from fastapi import APIRouter
 from fastapi.security import OAuth2PasswordBearer
 from services import extract
-from services.process_data import save_missions_to_db
+from services import process_mission_data, process_country_data
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -16,7 +16,7 @@ router = APIRouter()
              description="Saves embassies, consulates, and representations "
                                   "in mission_union collection")
 async def process_missions():
-    return await save_missions_to_db()
+    return await process_mission_data.save_missions_to_db()
 
 
 @router.post(
@@ -26,4 +26,4 @@ async def process_missions():
     summary="saves countries to 'countries' collection in db",
     )
 async def process_countries():
-    return await extract.all_countries_from_data()
+    return await process_country_data.save_countries_to_db()
