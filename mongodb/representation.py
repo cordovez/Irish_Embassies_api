@@ -15,5 +15,5 @@ class RepresentationDocument(Mission):
             pymongo.IndexModel(
                 keys=[("representation_name", pymongo.ASCENDING)],
                 name="representation_ascend",
-            ),
-        ]
+                ),
+            ]

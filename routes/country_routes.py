@@ -2,7 +2,6 @@
 from fastapi import HTTPException, status
 from mongodb.country import CountryDocument
 import fastapi
-from helpers import extract
 router = fastapi.APIRouter()
 
 

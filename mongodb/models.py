@@ -5,9 +5,6 @@ from mongodb.representation import RepresentationDocument
 from mongodb.diplomat import DiplomatDocument
 from mongodb.mission import MissionUnion
 from mongodb.user import UserBase
-from mongodb.public_embasy import PublicEmbassyDocument
-from mongodb.public_representation import PublicRepresentationDocument
-
 
 all_models = [
     UserBase,
@@ -18,6 +15,4 @@ all_models = [
     DiplomatDocument,
     UserBase,
     MissionUnion,
-    PublicEmbassyDocument,
-    PublicRepresentationDocument,
-]
+    ]
