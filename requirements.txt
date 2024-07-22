@@ -27,3 +27,4 @@ starlette==0.27.0
 toml==0.10.2
 typing_extensions==4.8.0
 uvicorn==0.23.2
+pytest

@@ -5,6 +5,9 @@ description = "An API to serve infomation on missions and heads of missions"
 authors = ["Juan Carlos Cordovez-Mantilla <cordovez@el-cordovez.com>"]
 readme = "README.md"
 
+[tool.pytest.ini_options]
+pythonpath = "."
+
 [tool.poetry.dependencies]
 python = "^3.11"
 fastapi = "^0.111.0"
