@@ -1,54 +1,73 @@
-from mongodb.diplomat import DiplomatDocument
+import pydantic
 import beanie
+from typing import Type
+from schemas.consulate import ConsulateOut
+from schemas.embassy import EmbassyOut
+from schemas.representation import RepresentationOut
 
 
-# async def get_all_missions():
-#     missions = await MissionUnion.all().to_list()
-    # for mission in missions:
-    #     if mission.type_of == 'embassy':
-    #         mission.head_of_mission = await _get_hom(mission.host_country.lower())
-    #     elif mission.type_of == 'consulate':
-    #         mission.head_of_mission = await _get_hom(mission.host_city.lower())
-    #     elif mission.type_of == 'representation':
-    #         mission.head_of_mission = await _get_hom(mission.representation_name.lower())
-    #
-    # return missions
+def _process_embassy_consulates(consulate_list: list[dict]):
+    return [ConsulateOut(city=consulate["host_city"],
+                         head_of_mission=consulate["head_of_mission"][
+                                             "first_name"] + " " +
+                                         consulate["head_of_mission"]["last_name"])
+            for consulate in consulate_list if consulate["head_of_mission"]]
 
 
-# async def get_embassies():
-#     missions = await get_all_missions()
-#     embassies = [mission for mission in missions if mission.type_of ==
-#                                                              "embassy"]
-#     consulates = [mission for mission in missions if mission.type_of == "consulate"]
-#
-#     for embassy in embassies:
-#         embassy.contact.city = compound_city_names(embassy.contact.city)
-#         for consulate in consulates:
-#             if consulate.contact.country == embassy.host_country.lower():
-#                 embassy.consulates.append(consulate)
-#     return embassies
+def _an_embassy_from(item: dict) -> EmbassyOut:
+    return EmbassyOut(country=item['host_country'],
+                      head_of_mission=item['head_of_mission'][
+                                          'first_name']
+                                      + " " + item['head_of_mission'][
+                                          'last_name'],
+                      address=item['contact'].get('address1'),
+                      telephone=item['contact'].get('tel'),
+                      consulates=_process_embassy_consulates(
+                          item.get('consulates', [])), )
 
 
-# async def get_consulates():
-#     missions = await get_all_missions()
-#     return [mission for mission in missions if mission.type_of == "consulate"]
-#
-#
-# async def get_representations():
-#     missions = await get_all_missions()
-#     return [mission for mission in missions if mission.type_of == "representation"]
-#
-#
-# async def get_mission_by_id(mission_id: str) -> beanie.Document:
-#     missions = await get_all_missions()
-#     for mission in missions:
-#         if str(mission.id) == mission_id:
-#             return mission
-#
-#
-# async def _get_hom(search_location: str) -> DiplomatDocument:
-#     diplomats = await DiplomatDocument.all().to_list()
-#
-#     for diplomat in diplomats:
-#         if diplomat.mission.lower() == search_location:
-#             return diplomat
+def _a_consulate_from(item: dict) -> ConsulateOut:
+    return ConsulateOut(city=item['host_city'],
+                        head_of_mission=item['head_of_mission'][
+                                            'first_name']
+                                        + " " + item['head_of_mission'][
+                                            'last_name'])
+
+
+def _a_representation_from(item: dict) -> RepresentationOut:
+    return RepresentationOut(
+        rep_name=item['representation_name'],
+        head_of_mission=item['head_of_mission'][
+                            'first_name'] + " " + item['head_of_mission'][
+                            'last_name'],
+        address=item['contact'].get('address1'), )
+
+
+def pydantic_response_for_all_items(response: list[beanie.Document],
+                                    response_model: Type[pydantic.BaseModel]):
+    items = []
+    for item in response:
+        item = item.model_dump()
+        if response_model == EmbassyOut:
+            items.append(_an_embassy_from(item)
+                         )
+        elif response_model == RepresentationOut:
+            items.append(_a_representation_from(item))
+
+        elif response_model == ConsulateOut:
+            items.append(_a_consulate_from(item))
+
+    return items
+
+
+def pydantic_response_for_one_item(response: beanie.Document,
+                                   response_model: Type[pydantic.BaseModel]):
+    item = response.model_dump()
+    if response_model == EmbassyOut:
+        return _an_embassy_from(item)
+
+    elif response_model == RepresentationOut:
+        return _a_representation_from(item)
+
+    else:
+        return _a_consulate_from(item)

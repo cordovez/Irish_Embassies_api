@@ -2,7 +2,7 @@ import pydantic
 from typing import Optional
 
 
-class ContactDetails(pydantic.BaseModel):
+class ContactOut(pydantic.BaseModel):
     address: Optional[str]
     tel: Optional[str]
     website: Optional[str]

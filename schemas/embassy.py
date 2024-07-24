@@ -1,18 +1,17 @@
 import pydantic
-from schemas.contact import ContactDetails
-from schemas.diplomat import DiplomatModel
-from schemas.consulate import ConsulateModel
+from schemas.contact import ContactOut
+from schemas.diplomat import DiplomatOut
+from schemas.consulate import ConsulateOut
 # from models.mission import MissionModel
-from typing import Optional, Literal
+from typing import Optional
+from pydantic import ConfigDict
 
 
-class EmbassyModel(pydantic.BaseModel):
-    type_of: Literal["embassy"]
+class EmbassyOut(pydantic.BaseModel):
     country: str
-    head_of_mission: DiplomatModel | None = None
-    contact: Optional[ContactDetails] | None = None
-    consulates: Optional[ConsulateModel] | None = (
-        None  # I cannot specify type of list object here (i.e. 'Mission') without
-        # incurring a circular import
-    )
+    head_of_mission: str | None
+    address: Optional[str] | None
+    telephone: Optional[str] | None
+    consulates: Optional[list[ConsulateOut]] | None = None
+
 

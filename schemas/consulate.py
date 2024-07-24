@@ -5,8 +5,6 @@ from mongodb.contact import ContactDetails
 from typing import Optional
 
 
-class ConsulateModel(pydantic.BaseModel):
-    type_of: Literal["consulate"]
+class ConsulateOut(pydantic.BaseModel):
     city: str
-    head_of_mission: DiplomatDocument
-    contact: Optional[ContactDetails]
+    head_of_mission: Optional[str]
