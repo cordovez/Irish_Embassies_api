@@ -2,18 +2,18 @@
 Public router
 """
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status
 
 from controllers.from_db import pydantic_response_for_all_items, \
     pydantic_response_for_one_item
 from mongodb.models import (MissionUnion, EmbassyDocument, RepresentationDocument,
-                            ConsulateDocument)
-from schemas.pydantic_schemas import EmbassyOut, ConsulateOut, RepresentationOut
+                            ConsulateDocument, CountryDocument, DiplomatDocument)
+from schemas.pydantic_schemas import (DiplomatOut, EmbassyOut, ConsulateOut,
+                                      RepresentationOut, CountryOut)
 
 router = APIRouter()
 
 
-# TODO: return item ids
 @router.get("/")
 async def all_missions():
     return await MissionUnion.all().to_list()
@@ -56,3 +56,31 @@ async def all_consulates():
 async def consulate_by_id(consulate_id: str):
     response = await ConsulateDocument.get(consulate_id)
     return pydantic_response_for_one_item(response, ConsulateOut)
+
+
+@router.get("/diplomats/", response_model=list[DiplomatOut])
+async def all_diplomats():
+    response = await DiplomatDocument.all().to_list()
+    homs = pydantic_response_for_all_items(response, DiplomatOut)
+    return sorted(homs, key=lambda x: x.last_name)
+
+
+@router.get("/diplomats/{diplomat_id}", response_model=DiplomatOut)
+async def consulate_by_id(diplomat_id: str):
+    response = await DiplomatDocument.get(diplomat_id)
+    return pydantic_response_for_one_item(response, DiplomatOut)
+
+
+@router.get("/countries")
+async def all_countries():
+    response = await CountryDocument.all().to_list()
+    return pydantic_response_for_all_items(response, CountryOut)
+
+@router.get("/countries/{country_id}")
+async def by_id(country_id: str):
+    try:
+        return await CountryDocument.get(country_id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Item not found"
+            ) from e

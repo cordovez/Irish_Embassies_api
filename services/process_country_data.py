@@ -2,7 +2,7 @@ from services import  read_data
 from controllers import  into_db
 from mongodb.models import CountryDocument
 from typing import List, Dict, Any
-from services import from_string
+import json
 import csv
 
 RAW_DATA = read_data.from_file_name("all_categories")
@@ -21,6 +21,16 @@ async def save_countries_to_db():
 # Helper Functions
 # ------------------------------------------------------------------------------
 
+def _assign_country_code_to_embassy(country_name: str) -> str:
+    with open("./data/country_codes_iso.json", "r") as f:
+        countries = json.load(f)
+
+    for country in countries:
+        if country_name == "Slovakia":
+            country_name = "Slovak Republic"
+        if country["name"] == country_name:
+            return country["alpha-3"]
+
 
 def _countries_from_json(data: List[Dict[str, Any]]) -> list[CountryDocument]:
     return [CountryDocument(
@@ -32,7 +42,7 @@ def _countries_from_json(data: List[Dict[str, Any]]) -> list[CountryDocument]:
                         item["name"]
                         ),
                     hosts_irish_mission=item["is_represented"],
-                    iso3_code=None,
+                    iso3_code= _assign_country_code_to_embassy(item["name"]),
                     ) for item in data if item["type_of"] == "country"]
 
 
@@ -65,6 +75,11 @@ def _location_of_foreign_mission_for(country: str) -> str | None:
 
 
 def _get_proper_name(country: str) -> str:
+    """
+    Function manages disparity in names from different source files. 'case' is the
+    name listed in either the London or Dublin lists of accredited missions, 'return'
+    is the final name saved in the db
+    """
     match country:
         case "United Kingdom of Great Britain and Northern Ireland":
             return "United Kingdom"
@@ -84,5 +99,7 @@ def _get_proper_name(country: str) -> str:
             return "Turkey"
         case "United States of America":
             return "United States"
+        case "Czech Republic":
+            return "Czechia"
         case _:
             return country

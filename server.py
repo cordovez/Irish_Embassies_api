@@ -10,11 +10,8 @@ from mongodb.db import init_db
 from routes import (
     token_route,
     process_routes,
-    diplomat_routes,
     user_routes,
-    country_routes,
     public_routes,
-    mission_routes,
     )
 
 
@@ -47,12 +44,9 @@ def root():
 
 
 app.include_router(token_route.router, tags=["Admin"])
-app.include_router(country_routes.router, prefix="/countries", tags=["Countries"])
 
-app.include_router(mission_routes.router, prefix="/missions", tags=["Missions"])
 app.include_router(public_routes.router, prefix="/public", tags=["Public"])
 
-app.include_router(diplomat_routes.router, prefix="/diplomats", tags=["Diplomats"])
 app.include_router(process_routes.router, prefix="/process", tags=["Data Processing"])
 app.include_router(user_routes.router, tags=["User"])
 
@@ -79,16 +73,6 @@ def custom_openapi():
         description=description,
         routes=app.routes,
         tags=[
-            {
-                "name": "Countries",
-                "description": "The listing of all countries and their Irish "
-                               "diplomatic representative (if any)",
-                },
-            {
-                "name": "Missions",
-                "description": "Unpopulated embassies, consulates, and representations "
-                               "intended for admin use"
-                },
             {
                 "name": "Public",
                 "description": "Read-only populated missions. Intended for public "
