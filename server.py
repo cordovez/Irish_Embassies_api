@@ -9,7 +9,6 @@ from mongodb.db import init_db
 # from routes.user_routes import user_route
 from routes import (
     token_route,
-    process_routes,
     user_routes,
     public_routes,
     )
@@ -47,7 +46,6 @@ app.include_router(token_route.router, tags=["Admin"])
 
 app.include_router(public_routes.router, prefix="/public", tags=["Public"])
 
-app.include_router(process_routes.router, prefix="/process", tags=["Data Processing"])
 app.include_router(user_routes.router, tags=["User"])
 
 
