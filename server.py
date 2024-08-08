@@ -11,6 +11,7 @@ from routes import (
     token_route,
     user_routes,
     public_routes,
+    private_routes,
     )
 
 
@@ -48,6 +49,8 @@ app.include_router(public_routes.router, prefix="/public", tags=["Public"])
 
 app.include_router(user_routes.router, tags=["User"])
 
+app.include_router(private_routes.router, prefix="/private", tags=["Private"])
+
 
 # app.include_router(token_route, tags=["token"])
 
@@ -76,15 +79,12 @@ def custom_openapi():
                 "description": "Read-only populated missions. Intended for public "
                                "access",
                 },
+            {
+                "name": "Private",
+                "description": "Create and Update missions. Intended for administrator "
+                               "only ",
+                },
 
-            {
-                "name": "Diplomats",
-                "description": "Diplomats posted abroad ",
-                },
-            {
-                "name": "Data Processing",
-                "description": "Routes for processing data saved by scraper",
-                },
             ],
         )
 

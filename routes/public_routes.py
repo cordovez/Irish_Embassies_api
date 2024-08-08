@@ -9,14 +9,15 @@ from controllers.from_db import pydantic_response_for_all_items, \
 from mongodb.models import (MissionUnion, EmbassyDocument, RepresentationDocument,
                             ConsulateDocument, CountryDocument, DiplomatDocument)
 from schemas.pydantic_schemas import (DiplomatOut, EmbassyOut, ConsulateOut,
-                                      RepresentationOut, CountryOut)
+                                      RepresentationOut, CountryOut, MissionOut)
 
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("/", response_model=list[MissionOut])
 async def all_missions():
-    return await MissionUnion.all().to_list()
+    response = await MissionUnion.all().to_list()
+    return pydantic_response_for_all_items(response, MissionOut )
 
 
 @router.get("/embassies", response_model=list[EmbassyOut])
@@ -66,7 +67,7 @@ async def all_diplomats():
 
 
 @router.get("/diplomats/{diplomat_id}", response_model=DiplomatOut)
-async def consulate_by_id(diplomat_id: str):
+async def diplomat_by_id(diplomat_id: str):
     response = await DiplomatDocument.get(diplomat_id)
     return pydantic_response_for_one_item(response, DiplomatOut)
 

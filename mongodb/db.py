@@ -16,6 +16,7 @@ model_classes = models.all_models
 
 async def init_db():
     client = motor.motor_asyncio.AsyncIOMotorClient(env["MONGO_URI"])
+    db = client[env["MONGO_DB"]]
     await beanie.init_beanie(
-        database=client[env["MONGO_DB"]], document_models=model_classes
+        database=db, document_models=model_classes
     )

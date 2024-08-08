@@ -2,7 +2,7 @@ import pydantic
 import beanie
 from typing import Type
 from schemas.pydantic_schemas import (DiplomatOut, EmbassyOut, ConsulateOut,
-                                      RepresentationOut, CountryOut)
+                                      RepresentationOut, CountryOut, MissionOut)
 
 
 # ------------------------------------------------------------------------------
@@ -25,6 +25,9 @@ def pydantic_response_for_all_items(response: list[beanie.Document],
 
         elif response_model == DiplomatOut:
             items.append(_a_diplomat_from(item))
+
+        elif response_model == MissionOut:
+            items.append(_a_mission_from(item))
 
         else:
             items.append(_a_country_from(item))
@@ -91,11 +94,13 @@ def _a_representation_from(item: dict) -> RepresentationOut:
 
 
 def _a_diplomat_from(item: dict) -> DiplomatOut:
-    return DiplomatOut(last_name=item['last_name'],
+    return DiplomatOut(full_name=item["full_name"],
+                       last_name=item['last_name'],
                        first_name=item['first_name'],
                        title="Ambassador" if item['mission_type'] == "embassy" else
                        "Consul General",
-                       mission=item['mission'],
+                       mission_type=item['mission_type'],
+                       mission_title=item['mission_title'],
                        id=item["id"])
 
 
@@ -107,3 +112,11 @@ def _a_country_from(item: dict) -> CountryOut:
         with_mission_in=item['with_mission_in'],
         hosts_irish_mission=item['hosts_irish_mission'],
         iso3_code=item['iso3_code'], )
+
+
+def _a_mission_from(item: dict) -> MissionOut:
+    return MissionOut(
+        id=item["id"],
+        mission_title=item['head_of_mission']['mission_title'],
+        head_of_mission=item['head_of_mission']['full_name']
+        )

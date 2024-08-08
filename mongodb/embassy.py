@@ -14,9 +14,3 @@ class EmbassyDocument(Mission):
     class Settings:
         name = "embassies"
         union_doc = MissionUnion
-        indexes = [
-            pymongo.IndexModel(
-                keys=[("host_country", pymongo.ASCENDING)],
-                name="embassy_ascending",
-            ),
-        ]

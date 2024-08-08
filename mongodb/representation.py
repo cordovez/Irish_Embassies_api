@@ -11,9 +11,3 @@ class RepresentationDocument(Mission):
     class Settings:
         name = "representations"
         union_doc = MissionUnion
-        indexes = [
-            pymongo.IndexModel(
-                keys=[("representation_name", pymongo.ASCENDING)],
-                name="representation_ascend",
-                ),
-            ]
