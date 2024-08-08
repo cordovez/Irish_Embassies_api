@@ -9,7 +9,7 @@ from mongodb.models import RepresentationDocument, DiplomatDocument
 router = APIRouter()
 
 
-@router.post("/representations/{rep_id}")
+@router.patch("/representations/{rep_id}")
 async def update_representation(request: RepresentationIn, rep_id: str):
     found_rep = await RepresentationDocument.get(rep_id)
     if not found_rep:
