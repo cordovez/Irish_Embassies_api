@@ -9,8 +9,3 @@ class ConsulateDocument(Mission):
     class Settings:
         name = "consulates"
         union_doc = MissionUnion
-        indexes = [
-            pymongo.IndexModel(
-                keys=[("host_city", pymongo.ASCENDING)], name="consulate_city"
-            ),
-        ]

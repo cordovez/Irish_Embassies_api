@@ -12,9 +12,3 @@ class CountryDocument(beanie.Document):
 
     class Settings:
         name = "countries"
-        indexes = [
-            pymongo.IndexModel(
-                keys=[("country_name", pymongo.ASCENDING)],
-                name="country_name_ascending",
-            ),
-        ]

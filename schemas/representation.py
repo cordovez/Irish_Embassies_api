@@ -2,11 +2,22 @@ import pydantic
 from mongodb.contact import ContactDetails
 from mongodb.models import DiplomatDocument
 from typing import Optional
-from typing import Literal
+from schemas.contact import ContactDetails
+from schemas.diplomat import DiplomatIn, DiplomatOut
+from mongodb.models import DiplomatDocument
 
 
-class RepresentationModel(pydantic.BaseModel):
-    type_of: Literal["representation"]
-    representation: str
-    head_of_mission: Optional[DiplomatDocument] | None
-    contact: Optional[ContactDetails] | None
+class RepresentationOut(pydantic.BaseModel):
+    id: str
+    rep_name: str
+    head_of_mission: Optional[str]
+    address: Optional[str]
+
+
+class RepresentationIn(pydantic.BaseModel):
+    head_of_mission: Optional[DiplomatIn] = None
+    contact: Optional[ContactDetails] = None
+    website: Optional[str] = None
+    representation_name: Optional[str] = None
+    host_city: Optional[str] = None
+    host_country: Optional[str] = None

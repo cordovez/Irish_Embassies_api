@@ -2,9 +2,18 @@ import pydantic
 from typing import Optional
 
 
-class DiplomatModel(pydantic.BaseModel):
-    last_name: str
-    first_name: str
-    title: Optional[str] | None = None
-    mission: Optional[str] | None = None
-    location: Optional[str] | None = None
+class DiplomatIn(pydantic.BaseModel):
+    full_name: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    mission_title: Optional[str] = None
+    mission_type: Optional[str] = None
+
+
+class DiplomatOut(pydantic.BaseModel):
+    id: str
+    full_name: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    mission_title: Optional[str] = None
+    mission_type: Optional[str] = None

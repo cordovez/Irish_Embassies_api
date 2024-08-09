@@ -9,14 +9,9 @@ from mongodb.db import init_db
 # from routes.user_routes import user_route
 from routes import (
     token_route,
-    embassy_routes,
-    admin_routes,
-    diplomat_routes,
     user_routes,
-    country_routes,
-    representation_routes,
-    consulate_routes,
-    mission_routes,
+    public_routes,
+    private_routes,
     )
 
 
@@ -24,6 +19,7 @@ from routes import (
 async def lifespan(app: FastAPI):
     await init_db()
     yield
+
 
 app = FastAPI(lifespan=lifespan)
 
@@ -48,22 +44,15 @@ def root():
 
 
 app.include_router(token_route.router, tags=["Admin"])
-app.include_router(country_routes.router, prefix="/countries", tags=["Countries"])
 
-app.include_router(mission_routes.router, prefix="/missions", tags=["Missions"])
-app.include_router(embassy_routes.router, prefix="/embassies", tags=["Embassies"])
-app.include_router(consulate_routes.router, prefix="/consulates", tags=["Consulates"])
-app.include_router(
-    representation_routes.router, prefix="/representations", tags=["Representations"]
-    )
-app.include_router(diplomat_routes.router, prefix="/diplomats", tags=["Diplomats"])
-app.include_router(admin_routes.router, prefix="/process", tags=["Admin"])
+app.include_router(public_routes.router, prefix="/public", tags=["Public"])
+
 app.include_router(user_routes.router, tags=["User"])
+
+app.include_router(private_routes.router, prefix="/private", tags=["Private"])
 
 
 # app.include_router(token_route, tags=["token"])
-
-
 
 
 # ------------------------------------------------------------------------------
@@ -75,7 +64,8 @@ def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
 
-    description = """An API to explore the various Irish Diplomatic Missions abroad and bilateral relations in general
+    description = """An API to explore the various Irish Diplomatic Missions abroad 
+    and bilateral relations in general
     """
 
     openapi_schema = get_openapi(
@@ -85,31 +75,16 @@ def custom_openapi():
         routes=app.routes,
         tags=[
             {
-                "name": "Countries",
-                "description": "The listing of all countries and their Irish "
-                               "diplomatic representative (if any)",
+                "name": "Public",
+                "description": "Read-only populated missions. Intended for public "
+                               "access",
                 },
             {
-                "name": "Missions",
-                "description": "Embassies, consulates, and representations"
+                "name": "Private",
+                "description": "Create and Update missions. Intended for administrator "
+                               "only ",
                 },
-            {
-                "name": "Embassies",
-                "description": "Ambassadorial missions abroad",
-                },
-            {"name": "Consulates", "description": "Irish Consulates abroad"},
-            {
-                "name": "Representations",
-                "description": "Diplomatic missions abroad other than embassies",
-                },
-            {
-                "name": "Diplomats",
-                "description": "Diplomats posted abroad ",
-                },
-            {
-                "name": "Admin",
-                "description": "API data management",
-                },
+
             ],
         )
 

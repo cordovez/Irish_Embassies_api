@@ -1,12 +1,8 @@
 import pydantic
-from typing import Literal
-from models.diplomat import DiplomatModel
-from models.contact import ContactDetails
 from typing import Optional
 
 
-class ConsulateModel(pydantic.BaseModel):
-    type_of: Literal["consulate"]
+class ConsulateOut(pydantic.BaseModel):
+    id: Optional[str] | None = None  # id only needed for consulates route
     city: str
-    head_of_mission: DiplomatModel
-    contact: Optional[ContactDetails]
+    head_of_mission: Optional[str]
